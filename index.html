@@ -88,6 +88,19 @@
       animation: pulse 1s infinite;
       color: #555;
     }
+    #collectionStatus {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: white;
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 5px;
+      text-align: left;
+    }
+    .uncollected {
+      color: #aaa;
+    }
     @keyframes pulse {
       0% { opacity: 0.3; }
       50% { opacity: 1; }
@@ -104,7 +117,7 @@
   </style>
 </head>
 <body>
-  <h1>Series Story Part 1</h1>
+  <h1 id="title">Series Story Part 1</h1>
   <img src="https://via.placeholder.com/300x200" alt="Main" class="main-img" />
   <div class="button-container">
     <button onclick="doPull(1)">1 Pull</button>
@@ -112,6 +125,7 @@
   </div>
   <div id="loading" class="loading" style="display: none;">Loading...</div>
   <div class="boxes" id="resultContainer"></div>
+  <div id="collectionStatus"></div>
 
   <script>
     const items = [
@@ -131,6 +145,27 @@
       { name: 'Item N', rarity: 'secret', image: 'https://via.placeholder.com/100x100?text=N' }
     ];
 
+    const collected = new Set();
+
+    function updateCollectionDisplay() {
+      const container = document.getElementById('collectionStatus');
+      let content = '<strong>Collection Progress:</strong><ul style="list-style:none; padding:0;">';
+      let allCollected = true;
+
+      items.forEach(item => {
+        const owned = collected.has(item.name);
+        if (!owned) allCollected = false;
+        content += `<li class="${owned ? '' : 'uncollected'}">${item.name}</li>`;
+      });
+
+      content += '</ul>';
+      container.innerHTML = content;
+
+      if (allCollected) {
+        document.getElementById('title').textContent = 'Series Story Part 1 (Completed)';
+      }
+    }
+
     function getRandomItem() {
       const roll = Math.random();
       if (roll < 0.75) {
@@ -147,7 +182,6 @@
     function doPull(count) {
       const container = document.getElementById('resultContainer');
       const loader = document.getElementById('loading');
-      container.innerHTML = '';
       loader.style.display = 'block';
 
       setTimeout(() => {
@@ -182,6 +216,11 @@
             const color = item.rarity === '4' ? '#3f8efc' :
                           item.rarity === '5' ? '#f9cc2f' : '#a85ff0';
             card.style.boxShadow = `0 0 20px 10px ${color}`;
+
+            if (!collected.has(item.name)) {
+              collected.add(item.name);
+              updateCollectionDisplay();
+            }
           });
 
           img.addEventListener('dblclick', () => {
@@ -191,6 +230,8 @@
           container.appendChild(card);
         }
       }, 1500);
+
+      updateCollectionDisplay();
     }
   </script>
 </body>
