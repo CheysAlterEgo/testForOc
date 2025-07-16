@@ -97,9 +97,23 @@
       padding: 10px;
       border-radius: 5px;
       text-align: left;
+      width: 220px;
     }
     .uncollected {
       color: #aaa;
+    }
+    .progress-bar {
+      height: 10px;
+      background: #ddd;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: #4caf50;
+      transition: width 0.5s ease-in-out;
     }
     @keyframes pulse {
       0% { opacity: 0.3; }
@@ -145,23 +159,27 @@
       { name: 'Item N', rarity: 'secret', image: 'https://via.placeholder.com/100x100?text=N' }
     ];
 
-    const collected = new Set();
+    const collection = {};
+    items.forEach(item => collection[item.name] = 0);
 
     function updateCollectionDisplay() {
       const container = document.getElementById('collectionStatus');
+      let collectedCount = 0;
       let content = '<strong>Collection Progress:</strong><ul style="list-style:none; padding:0;">';
-      let allCollected = true;
 
       items.forEach(item => {
-        const owned = collected.has(item.name);
-        if (!owned) allCollected = false;
-        content += `<li class="${owned ? '' : 'uncollected'}">${item.name}</li>`;
+        const count = collection[item.name];
+        const owned = count > 0;
+        if (owned) collectedCount++;
+        content += `<li class="${owned ? '' : 'uncollected'}">${item.name}${count > 1 ? ' (' + (count - 1) + ' dups)' : ''}</li>`;
       });
 
       content += '</ul>';
+      const progressPercent = (collectedCount / items.length) * 100;
+      content += `<div class="progress-bar"><div class="progress-bar-fill" style="width:${progressPercent}%"></div></div>`;
       container.innerHTML = content;
 
-      if (allCollected) {
+      if (collectedCount === items.length) {
         document.getElementById('title').textContent = 'Series Story Part 1 (Completed)';
       }
     }
@@ -219,10 +237,8 @@
                           item.rarity === '5' ? '#f9cc2f' : '#a85ff0';
             card.style.boxShadow = `0 0 20px 10px ${color}`;
 
-            if (!collected.has(item.name)) {
-              collected.add(item.name);
-              updateCollectionDisplay();
-            }
+            collection[item.name]++;
+            updateCollectionDisplay();
           });
 
           img.addEventListener('dblclick', () => {
@@ -232,8 +248,6 @@
           container.appendChild(card);
         }
       }, 1500);
-
-      updateCollectionDisplay();
     }
   </script>
 </body>
