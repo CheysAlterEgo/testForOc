@@ -33,30 +33,55 @@
       gap: 10px;
       margin-top: 20px;
     }
-   .box {
-  width: 230px;
-  height: 230px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: grey;
-  cursor: pointer;
-  border-radius: 10px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-    .blue { background-color: #3f8efc; }
-    .yellow { background-color: #f9cc2f; }
-    .purple { background-color: #a85ff0; }
-    .box img {
+    .card {
+      width: 100px;
+      height: 100px;
+      perspective: 1000px;
+    }
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.8s;
+      transform-style: preserve-3d;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .card.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+    .card-front, .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 10px;
+    }
+    .card-front {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card-back {
+      background: white;
+      transform: rotateY(180deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card-back img {
       max-width: 100%;
       max-height: 100%;
       border-radius: 10px;
       transition: transform 0.3s ease;
     }
-   .zoomed {
-  transform: scale(1.6);
-  z-index: 10;
-}
+    .card-back img.zoomed {
+      transform: scale(1.6);
+      z-index: 10;
+    }
+    .blue { background-color: #3f8efc; }
+    .yellow { background-color: #f9cc2f; }
+    .purple { background-color: #a85ff0; }
     .loading {
       font-size: 20px;
       margin-top: 20px;
@@ -68,21 +93,19 @@
       50% { opacity: 1; }
       100% { opacity: 0.3; }
     }
-    /* Animation styles */
-   .animate-glow {
-  animation: glowBase 1s ease forwards;
-}
-
-@keyframes glowBase {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
-}
+    .animate-glow {
+      animation: glowBase 1s ease forwards;
+    }
+    @keyframes glowBase {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
   </style>
 </head>
 <body>
   <h1>Series Story Part 1</h1>
-  <img src="test1.png" alt="Main" class="main-img" />
+  <img src="https://via.placeholder.com/300x200" alt="Main" class="main-img" />
   <div class="button-container">
     <button onclick="doPull(1)">1 Pull</button>
     <button onclick="doPull(5)">5 Pull</button>
@@ -91,7 +114,7 @@
   <div class="boxes" id="resultContainer"></div>
 
   <script>
-    const items = [
+   const items = [
   { name: 'Item A', rarity: '4', image: 'test2.png' },
   { name: 'Item B', rarity: '4', image: 'test3.png' },
   { name: 'Item C', rarity: '4', image: 'test4.png' },
@@ -101,9 +124,9 @@
 
     function getRandomItem() {
       const roll = Math.random();
-      if (roll < 0.6) return items[Math.floor(Math.random() * 3)]; // 60% 4-star
-      if (roll < 0.95) return items[3]; // 35% 5-star
-      return items[4]; // 5% secret
+      if (roll < 0.6) return items[Math.floor(Math.random() * 3)];
+      if (roll < 0.95) return items[3];
+      return items[4];
     }
 
     function doPull(count) {
@@ -116,30 +139,45 @@
         loader.style.display = 'none';
         for (let i = 0; i < count; i++) {
           const item = getRandomItem();
-          const box = document.createElement('div');
-          box.className = 'box ' + (item.rarity === '4' ? 'blue' : item.rarity === '5' ? 'yellow' : 'purple');
+          const card = document.createElement('div');
+          card.className = 'card';
 
-          box.addEventListener('click', () => {
-            box.innerHTML = `<img src="${item.image}" alt="${item.name}" title="${item.name}" />`;
+          const cardInner = document.createElement('div');
+          cardInner.className = 'card-inner';
 
-const img = box.querySelector('img');
-img.addEventListener('dblclick', () => {
-  img.classList.toggle('zoomed');
-});
+          const cardFront = document.createElement('div');
+          cardFront.className = 'card-front ' + (item.rarity === '4' ? 'blue' : item.rarity === '5' ? 'yellow' : 'purple');
 
-            // Add animation based on rarity
-           box.classList.add('animate-glow');
+          const cardBack = document.createElement('div');
+          cardBack.className = 'card-back';
+          const img = document.createElement('img');
+          img.src = item.image;
+          img.alt = item.name;
+          img.title = item.name;
+          cardBack.appendChild(img);
 
-const color = item.rarity === '4' ? '#3f8efc' :
-              item.rarity === '5' ? '#f9cc2f' : '#a85ff0';
+          cardInner.appendChild(cardFront);
+          cardInner.appendChild(cardBack);
+          card.appendChild(cardInner);
 
-box.style.boxShadow = `0 0 20px 10px ${color}`;
+          card.addEventListener('click', () => {
+            card.classList.add('flipped');
+            card.classList.add('animate-glow');
+
+            const color = item.rarity === '4' ? '#3f8efc' :
+                          item.rarity === '5' ? '#f9cc2f' : '#a85ff0';
+            card.style.boxShadow = `0 0 20px 10px ${color}`;
           });
 
-          container.appendChild(box);
+          img.addEventListener('dblclick', () => {
+            img.classList.toggle('zoomed');
+          });
+
+          container.appendChild(card);
         }
-      }, 1500); // Delay for suspense
+      }, 1500);
     }
   </script>
 </body>
 </html>
+
