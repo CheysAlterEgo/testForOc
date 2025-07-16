@@ -182,10 +182,12 @@
     function doPull(count) {
       const container = document.getElementById('resultContainer');
       const loader = document.getElementById('loading');
+      container.innerHTML = '';
       loader.style.display = 'block';
 
       setTimeout(() => {
         loader.style.display = 'none';
+
         for (let i = 0; i < count; i++) {
           const item = getRandomItem();
           const card = document.createElement('div');
