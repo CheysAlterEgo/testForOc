@@ -171,7 +171,7 @@
         const count = collection[item.name];
         const owned = count > 0;
         if (owned) collectedCount++;
-        content += `<li class="${owned ? '' : 'uncollected'}">${item.name}${count > 1 ? ' (' + (count - 1) + ' dups)' : ''}</li>`;
+        content += `<li class="${owned ? '' : 'uncollected'}">${item.name}${count > 1 ? ' (' + count + ')' : ''}</li>`;
       });
 
       content += '</ul>';
@@ -237,7 +237,12 @@
                           item.rarity === '5' ? '#f9cc2f' : '#a85ff0';
             card.style.boxShadow = `0 0 20px 10px ${color}`;
 
-            collection[item.name]++;
+            if (collection[item.name] === 0) {
+              collection[item.name] = 1;
+            } else {
+              collection[item.name]++;
+            }
+
             updateCollectionDisplay();
           });
 
