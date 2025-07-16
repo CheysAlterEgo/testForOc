@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" type="text/css" href="styles.css">
   <title>Gacha Test</title>
   <style>
     body {
@@ -179,13 +178,7 @@
 
       content += '</ul>';
       const progressPercent = (collectedCount / items.length) * 100;
-      content += `
-  <div class="progress-bar">
-    <div class="progress-bar-fill" style="width:${progressPercent}%">
-      <img src="stupidDinoo.png" class="progress-icon" />
-    </div>
-  </div>`;
-
+      content += `<div class="progress-bar"><div class="progress-bar-fill" style="width:${progressPercent}%"></div></div>`;
       container.innerHTML = content;
 
       if (collectedCount === items.length) {
