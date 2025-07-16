@@ -7,25 +7,34 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      text-align: center;
       background-color: #f0f0f0;
+      margin: 0;
+      padding: 0;
     }
+
     h1 {
       margin-top: 30px;
+      text-align: center;
     }
+
     .main-img {
       width: 300px;
+      display: block;
       margin: 20px auto;
     }
+
     .button-container {
+      text-align: center;
       margin: 20px;
     }
+
     button {
       margin: 0 10px;
       padding: 10px 20px;
       font-size: 16px;
       cursor: pointer;
     }
+
     .boxes {
       display: flex;
       justify-content: center;
@@ -33,11 +42,13 @@
       gap: 10px;
       margin-top: 20px;
     }
+
     .card {
       width: 280px;
       height: 280px;
       perspective: 1000px;
     }
+
     .card-inner {
       position: relative;
       width: 100%;
@@ -47,9 +58,11 @@
       border-radius: 10px;
       cursor: pointer;
     }
+
     .card.flipped .card-inner {
       transform: rotateY(180deg);
     }
+
     .card-front, .card-back {
       position: absolute;
       width: 100%;
@@ -57,11 +70,13 @@
       backface-visibility: hidden;
       border-radius: 10px;
     }
+
     .card-front {
       display: flex;
       align-items: center;
       justify-content: center;
     }
+
     .card-back {
       background: white;
       transform: rotateY(180deg);
@@ -69,25 +84,31 @@
       align-items: center;
       justify-content: center;
     }
+
     .card-back img {
       max-width: 100%;
       max-height: 100%;
       border-radius: 10px;
       transition: transform 0.3s ease;
     }
+
     .card-back img.zoomed {
       transform: scale(1.6);
       z-index: 10;
     }
+
     .blue { background-color: #3f8efc; }
     .yellow { background-color: #f9cc2f; }
     .purple { background-color: #a85ff0; }
+
     .loading {
       font-size: 20px;
       margin-top: 20px;
+      text-align: center;
       animation: pulse 1s infinite;
       color: #555;
     }
+
     #collectionStatus {
       position: fixed;
       top: 10px;
@@ -99,9 +120,11 @@
       text-align: left;
       width: 220px;
     }
+
     .uncollected {
       color: #aaa;
     }
+
     .progress-bar {
       height: 10px;
       background: #ddd;
@@ -109,34 +132,110 @@
       overflow: hidden;
       margin-top: 10px;
     }
+
     .progress-bar-fill {
       height: 100%;
       width: 0%;
       background: #4caf50;
       transition: width 0.5s ease-in-out;
     }
+
     @keyframes pulse {
       0% { opacity: 0.3; }
       50% { opacity: 1; }
       100% { opacity: 0.3; }
     }
+
     .animate-glow {
       animation: glowBase 1s ease forwards;
     }
+
     @keyframes glowBase {
       0% { transform: scale(1); }
       50% { transform: scale(1.1); }
       100% { transform: scale(1); }
     }
+
+    #cookieGame {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      background: #fff6ec;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      padding: 10px;
+      width: 330px;
+    }
+
+    #cookieGame h2 {
+      margin: 10px 0;
+      font-size: 18px;
+    }
+
+    #cookieGrid {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      gap: 5px;
+      justify-content: center;
+    }
+
+    .cookie {
+      width: 100px;
+      height: 100px;
+      background-image: url('cookie.png');
+      background-size: cover;
+      border-radius: 50%;
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.3s;
+    }
+
+    .cookie.clicked {
+      box-shadow: 0 0 15px 5px #f5b942;
+      transform: scale(1.05);
+    }
+
+    .cookie .reward {
+      position: absolute;
+      top: 35%;
+      left: 0;
+      right: 0;
+      color: black;
+      font-weight: bold;
+      font-size: 20px;
+      display: none;
+      text-align: center;
+    }
+
+    .cookie.revealed .reward {
+      display: block;
+    }
+
+    #notEnough {
+      color: red;
+      font-weight: bold;
+      margin-top: 10px;
+      display: none;
+    }
   </style>
 </head>
 <body>
+
+  <div id="cookieGame">
+    <h2>Pick a Cookie</h2>
+    <div id="countdown">Time left: 30s</div>
+    <div id="cookieGrid"></div>
+    <div style="margin-top: 10px;">Coins: <span id="coinDisplay">0</span></div>
+  </div>
+
   <h1 id="title">Series Story Part 1</h1>
   <img src="https://via.placeholder.com/300x200" alt="Main" class="main-img" />
   <div class="button-container">
     <button onclick="doPull(1)">1 Pull</button>
     <button onclick="doPull(5)">5 Pull</button>
+    <div id="notEnough">You don't have enough coins!</div>
   </div>
+
   <div id="loading" class="loading" style="display: none;">Loading...</div>
   <div class="boxes" id="resultContainer"></div>
   <div id="collectionStatus"></div>
@@ -145,21 +244,79 @@
 
   <script>
     const items = [
-  { name: 'Mika', rarity: '4', image: 'images/sakura.png' },
-  { name: 'Shoya', rarity: '4', image: 'images/luna.png' },
-  { name: 'Melanie', rarity: '4', image: 'images/kai.png' },
-  { name: 'Damian', rarity: '4', image: 'images/mira.png' },
-  { name: 'Matt', rarity: '4', image: 'images/zane.png' },
-  { name: 'Susurri', rarity: '4', image: 'images/nova.png' },
-  { name: 'Stella', rarity: '4', image: 'images/yuki.png' },
-  { name: 'Yumiko', rarity: '5', image: 'yum.png' },
-  { name: 'Aiko', rarity: '5', image: 'images/orion.png' },
-  { name: 'Luna', rarity: '5', image: 'images/leo.png' },
-  { name: 'Hyun', rarity: '5', image: 'images/iris.png' },
-  { name: 'Moon', rarity: '5', image: 'images/vera.png' },
-  { name: 'Vivian', rarity: '5', image: 'images/elio.png' },
-  { name: 'Andrew', rarity: 'secret', image: 'images/secret.png' }
-];
+      { name: 'Mika', rarity: '4', image: 'images/sakura.png' },
+      { name: 'Shoya', rarity: '4', image: 'images/luna.png' },
+      { name: 'Melanie', rarity: '4', image: 'images/kai.png' },
+      { name: 'Damian', rarity: '4', image: 'images/mira.png' },
+      { name: 'Matt', rarity: '4', image: 'images/zane.png' },
+      { name: 'Susurri', rarity: '4', image: 'images/nova.png' },
+      { name: 'Stella', rarity: '4', image: 'images/yuki.png' },
+      { name: 'Yumiko', rarity: '5', image: 'yum.png' },
+      { name: 'Aiko', rarity: '5', image: 'images/orion.png' },
+      { name: 'Luna', rarity: '5', image: 'images/leo.png' },
+      { name: 'Hyun', rarity: '5', image: 'images/iris.png' },
+      { name: 'Moon', rarity: '5', image: 'images/vera.png' },
+      { name: 'Vivian', rarity: '5', image: 'images/elio.png' },
+      { name: 'Andrew', rarity: 'secret', image: 'images/secret.png' }
+    ];
+
+    let coinCount = 0;
+    const COOKIE_REWARDS = [1, 1, 5, 5, 5, 10];
+    let cookiesClickable = true;
+    let countdown = 45;
+    let countdownInterval;
+
+    const coinDisplay = document.getElementById('coinDisplay');
+    const cookieGrid = document.getElementById('cookieGrid');
+    const countdownDisplay = document.getElementById('countdown');
+    const notEnoughMsg = document.getElementById('notEnough');
+
+    function updateCoinDisplay() {
+      coinDisplay.textContent = coinCount;
+    }
+
+    function createCookies() {
+      cookieGrid.innerHTML = '';
+      const shuffled = [...COOKIE_REWARDS].sort(() => Math.random() - 0.5);
+
+      shuffled.forEach(reward => {
+        const div = document.createElement('div');
+        div.className = 'cookie';
+        const label = document.createElement('div');
+        label.className = 'reward';
+        label.textContent = `+${reward}`;
+        div.appendChild(label);
+        cookieGrid.appendChild(div);
+
+        div.addEventListener('click', () => {
+          if (!cookiesClickable) return;
+          cookiesClickable = false;
+          div.classList.add('clicked');
+          label.style.display = 'block';
+          coinCount += reward;
+          updateCoinDisplay();
+
+          [...cookieGrid.children].forEach(c => {
+            const l = c.querySelector('.reward');
+            l.style.display = 'block';
+          });
+
+          countdown = 30;
+          countdownInterval = setInterval(() => {
+            countdown--;
+            countdownDisplay.textContent = `Time left: ${countdown}s`;
+            if (countdown <= 0) {
+              clearInterval(countdownInterval);
+              cookiesClickable = true;
+              createCookies();
+            }
+          }, 1000);
+        });
+      });
+    }
+
+    createCookies();
+    updateCoinDisplay();
 
     const collection = {};
     items.forEach(item => collection[item.name] = 0);
@@ -178,34 +335,27 @@
 
       content += '</ul>';
       const progressPercent = (collectedCount / items.length) * 100;
-     content += `
-  <div class="progress-bar">
-    <div class="progress-bar-fill" style="width:${progressPercent}%">
-      <img src="hearticon.png" class="progress-icon" />
-    </div>
-  </div>`;
-
+      content += `<div class="progress-bar"><div class="progress-bar-fill" style="width:${progressPercent}%"></div></div>`;
       container.innerHTML = content;
-
-      if (collectedCount === items.length) {
-        document.getElementById('title').textContent = 'Series Story Part 1 (Completed)';
-      }
     }
 
     function getRandomItem() {
       const roll = Math.random();
-      if (roll < 0.75) {
-        const fourStars = items.filter(item => item.rarity === '4');
-        return fourStars[Math.floor(Math.random() * fourStars.length)];
-      } else if (roll < 0.95) {
-        const fiveStars = items.filter(item => item.rarity === '5');
-        return fiveStars[Math.floor(Math.random() * fiveStars.length)];
-      } else {
-        return items.find(item => item.rarity === 'secret');
-      }
+      if (roll < 0.75) return items.filter(i => i.rarity === '4')[Math.floor(Math.random() * 7)];
+      if (roll < 0.95) return items.filter(i => i.rarity === '5')[Math.floor(Math.random() * 6)];
+      return items.find(i => i.rarity === 'secret');
     }
 
     function doPull(count) {
+      if (coinCount < count) {
+        notEnoughMsg.style.display = 'block';
+        setTimeout(() => notEnoughMsg.style.display = 'none', 2000);
+        return;
+      }
+
+      coinCount -= count;
+      updateCoinDisplay();
+
       const container = document.getElementById('resultContainer');
       const loader = document.getElementById('loading');
       container.innerHTML = '';
@@ -213,18 +363,14 @@
 
       setTimeout(() => {
         loader.style.display = 'none';
-
         for (let i = 0; i < count; i++) {
           const item = getRandomItem();
           const card = document.createElement('div');
           card.className = 'card';
-
           const cardInner = document.createElement('div');
           cardInner.className = 'card-inner';
-
           const cardFront = document.createElement('div');
           cardFront.className = 'card-front ' + (item.rarity === '4' ? 'blue' : item.rarity === '5' ? 'yellow' : 'purple');
-
           const cardBack = document.createElement('div');
           cardBack.className = 'card-back';
           const img = document.createElement('img');
@@ -232,36 +378,21 @@
           img.alt = item.name;
           img.title = item.name;
           cardBack.appendChild(img);
-
           cardInner.appendChild(cardFront);
           cardInner.appendChild(cardBack);
           card.appendChild(cardInner);
-
           card.addEventListener('click', () => {
             card.classList.add('flipped');
             card.classList.add('animate-glow');
-
-            const color = item.rarity === '4' ? '#3f8efc' :
-                          item.rarity === '5' ? '#f9cc2f' : '#a85ff0';
-            card.style.boxShadow = `0 0 20px 10px ${color}`;
-
             const sound = document.getElementById('flipSound');
             sound.currentTime = 0;
             sound.play();
-
-            if (collection[item.name] === 0) {
-              collection[item.name] = 1;
-            } else {
-              collection[item.name]++;
-            }
-
+            collection[item.name]++;
             updateCollectionDisplay();
           });
-
           img.addEventListener('dblclick', () => {
             img.classList.toggle('zoomed');
           });
-
           container.appendChild(card);
         }
       }, 1500);
