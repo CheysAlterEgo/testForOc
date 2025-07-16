@@ -114,19 +114,34 @@
   <div class="boxes" id="resultContainer"></div>
 
   <script>
-      const items = [
-  { name: 'Item A', rarity: '4', image: 'test2.png' },
-  { name: 'Item B', rarity: '4', image: 'test3.png' },
-  { name: 'Item C', rarity: '4', image: 'test4.png' },
-  { name: 'Item D', rarity: '5', image: 'test5.png' },
-  { name: 'Item E', rarity: 'secret', image: 'test6.png' },
-];
+    const items = [
+      { name: 'Item A', rarity: '4', image: 'https://via.placeholder.com/100x100?text=A' },
+      { name: 'Item B', rarity: '4', image: 'https://via.placeholder.com/100x100?text=B' },
+      { name: 'Item C', rarity: '4', image: 'https://via.placeholder.com/100x100?text=C' },
+      { name: 'Item D', rarity: '4', image: 'https://via.placeholder.com/100x100?text=D' },
+      { name: 'Item E', rarity: '4', image: 'https://via.placeholder.com/100x100?text=E' },
+      { name: 'Item F', rarity: '4', image: 'https://via.placeholder.com/100x100?text=F' },
+      { name: 'Item G', rarity: '4', image: 'https://via.placeholder.com/100x100?text=G' },
+      { name: 'Item H', rarity: '5', image: 'https://via.placeholder.com/100x100?text=H' },
+      { name: 'Item I', rarity: '5', image: 'https://via.placeholder.com/100x100?text=I' },
+      { name: 'Item J', rarity: '5', image: 'https://via.placeholder.com/100x100?text=J' },
+      { name: 'Item K', rarity: '5', image: 'https://via.placeholder.com/100x100?text=K' },
+      { name: 'Item L', rarity: '5', image: 'https://via.placeholder.com/100x100?text=L' },
+      { name: 'Item M', rarity: '5', image: 'https://via.placeholder.com/100x100?text=M' },
+      { name: 'Item N', rarity: 'secret', image: 'https://via.placeholder.com/100x100?text=N' }
+    ];
 
     function getRandomItem() {
       const roll = Math.random();
-      if (roll < 0.6) return items[Math.floor(Math.random() * 3)];
-      if (roll < 0.95) return items[3];
-      return items[4];
+      if (roll < 0.75) {
+        const fourStars = items.filter(item => item.rarity === '4');
+        return fourStars[Math.floor(Math.random() * fourStars.length)];
+      } else if (roll < 0.95) {
+        const fiveStars = items.filter(item => item.rarity === '5');
+        return fiveStars[Math.floor(Math.random() * fiveStars.length)];
+      } else {
+        return items.find(item => item.rarity === 'secret');
+      }
     }
 
     function doPull(count) {
