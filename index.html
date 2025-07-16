@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gacha Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f0f0f0;
+    }
+    h1 {
+      margin-top: 30px;
+    }
+    .main-img {
+      width: 300px;
+      margin: 20px auto;
+    }
+    .button-container {
+      margin: 20px;
+    }
+    button {
+      margin: 0 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .boxes {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .box {
+      width: 100px;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: grey;
+      cursor: pointer;
+      border-radius: 10px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .blue { background-color: #3f8efc; }
+    .yellow { background-color: #f9cc2f; }
+    .purple { background-color: #a85ff0; }
+    .box img {
+      max-width: 100%;
+      max-height: 100%;
+      border-radius: 10px;
+      transition: transform 0.3s ease;
+    }
+    .box img:hover {
+      transform: scale(1.6);
+      z-index: 10;
+    }
+    .loading {
+      font-size: 20px;
+      margin-top: 20px;
+      animation: pulse 1s infinite;
+      color: #555;
+    }
+    @keyframes pulse {
+      0% { opacity: 0.3; }
+      50% { opacity: 1; }
+      100% { opacity: 0.3; }
+    }
+    /* Animation styles */
+    .animate-5star {
+      animation: glow5 1s ease forwards;
+    }
+    .animate-secret {
+      animation: glowSecret 1s ease forwards;
+    }
+    @keyframes glow5 {
+      0% { box-shadow: 0 0 5px #f9cc2f; transform: scale(1); }
+      50% { box-shadow: 0 0 25px #f9cc2f; transform: scale(1.1); }
+      100% { box-shadow: 0 0 10px #f9cc2f; transform: scale(1); }
+    }
+    @keyframes glowSecret {
+      0% { box-shadow: 0 0 5px #a85ff0; transform: rotate(0deg) scale(1); }
+      50% { box-shadow: 0 0 40px #a85ff0; transform: rotate(360deg) scale(1.2); }
+      100% { box-shadow: 0 0 15px #a85ff0; transform: rotate(720deg) scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <h1>Series Story Part 1</h1>
+  <img src="https://via.placeholder.com/300x200" alt="Main" class="main-img" />
+  <div class="button-container">
+    <button onclick="doPull(1)">1 Pull</button>
+    <button onclick="doPull(5)">5 Pull</button>
+  </div>
+  <div id="loading" class="loading" style="display: none;">Loading...</div>
+  <div class="boxes" id="resultContainer"></div>
+
+  <script>
+    const items = [
+      { name: 'Item A', rarity: '4', image: 'https://via.placeholder.com/100x100?text=A' },
+      { name: 'Item B', rarity: '4', image: 'https://via.placeholder.com/100x100?text=B' },
+      { name: 'Item C', rarity: '4', image: 'https://via.placeholder.com/100x100?text=C' },
+      { name: 'Item D', rarity: '5', image: 'https://via.placeholder.com/100x100?text=D' },
+      { name: 'Item E', rarity: 'secret', image: 'https://via.placeholder.com/100x100?text=E' },
+    ];
+
+    function getRandomItem() {
+      const roll = Math.random();
+      if (roll < 0.6) return items[Math.floor(Math.random() * 3)]; // 60% 4-star
+      if (roll < 0.95) return items[3]; // 35% 5-star
+      return items[4]; // 5% secret
+    }
+
+    function doPull(count) {
+      const container = document.getElementById('resultContainer');
+      const loader = document.getElementById('loading');
+      container.innerHTML = '';
+      loader.style.display = 'block';
+
+      setTimeout(() => {
+        loader.style.display = 'none';
+        for (let i = 0; i < count; i++) {
+          const item = getRandomItem();
+          const box = document.createElement('div');
+          box.className = 'box ' + (item.rarity === '4' ? 'blue' : item.rarity === '5' ? 'yellow' : 'purple');
+
+          box.addEventListener('click', () => {
+            box.innerHTML = `<img src="${item.image}" alt="${item.name}" title="${item.name}" />`;
+
+            // Add animation based on rarity
+            if (item.rarity === '5') {
+              box.classList.add('animate-5star');
+            } else if (item.rarity === 'secret') {
+              box.classList.add('animate-secret');
+            }
+          });
+
+          container.appendChild(box);
+        }
+      }, 1500); // Delay for suspense
+    }
+  </script>
+</body>
+</html>
