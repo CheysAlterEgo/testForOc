@@ -141,6 +141,8 @@
   <div class="boxes" id="resultContainer"></div>
   <div id="collectionStatus"></div>
 
+  <audio id="flipSound" src="https://www.myinstants.com/media/sounds/pop.mp3"></audio>
+
   <script>
     const items = [
       { name: 'Item A', rarity: '4', image: 'https://via.placeholder.com/100x100?text=A' },
@@ -236,6 +238,10 @@
             const color = item.rarity === '4' ? '#3f8efc' :
                           item.rarity === '5' ? '#f9cc2f' : '#a85ff0';
             card.style.boxShadow = `0 0 20px 10px ${color}`;
+
+            const sound = document.getElementById('flipSound');
+            sound.currentTime = 0;
+            sound.play();
 
             if (collection[item.name] === 0) {
               collection[item.name] = 1;
