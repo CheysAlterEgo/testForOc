@@ -178,7 +178,13 @@
 
       content += '</ul>';
       const progressPercent = (collectedCount / items.length) * 100;
-      content += `<div class="progress-bar"><div class="progress-bar-fill" style="width:${progressPercent}%"></div></div>`;
+     content += `
+  <div class="progress-bar">
+    <div class="progress-bar-fill" style="width:${progressPercent}%">
+      <img src="stupidDinoo.png" class="progress-icon" />
+    </div>
+  </div>`;
+
       container.innerHTML = content;
 
       if (collectedCount === items.length) {
