@@ -53,10 +53,10 @@
       border-radius: 10px;
       transition: transform 0.3s ease;
     }
-    .box img:hover {
-      transform: scale(1.6);
-      z-index: 10;
-    }
+   .zoomed {
+  transform: scale(1.6);
+  z-index: 10;
+}
     .loading {
       font-size: 20px;
       margin-top: 20px;
@@ -121,6 +121,11 @@
 
           box.addEventListener('click', () => {
             box.innerHTML = `<img src="${item.image}" alt="${item.name}" title="${item.name}" />`;
+
+const img = box.querySelector('img');
+img.addEventListener('dblclick', () => {
+  img.classList.toggle('zoomed');
+});
 
             // Add animation based on rarity
            box.classList.add('animate-glow');
