@@ -69,22 +69,15 @@
       100% { opacity: 0.3; }
     }
     /* Animation styles */
-    .animate-5star {
-      animation: glow5 1s ease forwards;
-    }
-    .animate-secret {
-      animation: glowSecret 1s ease forwards;
-    }
-    @keyframes glow5 {
-      0% { box-shadow: 0 0 5px #f9cc2f; transform: scale(1); }
-      50% { box-shadow: 0 0 25px #f9cc2f; transform: scale(1.1); }
-      100% { box-shadow: 0 0 10px #f9cc2f; transform: scale(1); }
-    }
-    @keyframes glowSecret {
-      0% { box-shadow: 0 0 5px #a85ff0; transform: rotate(0deg) scale(1); }
-      50% { box-shadow: 0 0 40px #a85ff0; transform: rotate(360deg) scale(1.2); }
-      100% { box-shadow: 0 0 15px #a85ff0; transform: rotate(720deg) scale(1); }
-    }
+   .animate-glow {
+  animation: glowBase 1s ease forwards;
+}
+
+@keyframes glowBase {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
   </style>
 </head>
 <body>
@@ -130,11 +123,12 @@
             box.innerHTML = `<img src="${item.image}" alt="${item.name}" title="${item.name}" />`;
 
             // Add animation based on rarity
-            if (item.rarity === '5') {
-              box.classList.add('animate-5star');
-            } else if (item.rarity === 'secret') {
-              box.classList.add('animate-secret');
-            }
+           box.classList.add('animate-glow');
+
+const color = item.rarity === '4' ? '#3f8efc' :
+              item.rarity === '5' ? '#f9cc2f' : '#a85ff0';
+
+box.style.boxShadow = `0 0 20px 10px ${color}`;
           });
 
           container.appendChild(box);
