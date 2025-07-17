@@ -176,15 +176,16 @@
     }
 
     #cookieGame {
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      background: #fff6ec;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      padding: 10px;
-      width: 330px;
-    }
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  background: transparent; /* was #fff6ec */
+  border-radius: 0;         /* removed rounding */
+  box-shadow: none;         /* removed shadow */
+  padding: 0;               /* removed padding */
+  width: auto;              /* removed fixed width */
+}
+
 
     #cookieGame h2 {
       margin: 10px 0;
@@ -199,15 +200,16 @@
     }
 
     .cookie {
-      width: 100px;
-      height: 100px;
-      background-image: url('cookie.png');
-      background-size: cover;
-      border-radius: 50%;
-      cursor: pointer;
-      position: relative;
-      transition: transform 0.3s;
-    }
+  width: 100px;
+  height: 100px;
+  background-image: url('bettercookie.png'); /* updated */
+  background-size: cover;
+  border-radius: 50%;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.3s;
+}
+
 
     .cookie.clicked {
       box-shadow: 0 0 15px 5px #f5b942;
@@ -301,6 +303,16 @@
     shuffled.forEach(reward => {
       const div = document.createElement('div');
       div.className = 'cookie';
+      const tray = document.createElement('img');
+tray.src = 'tray.png';
+tray.alt = 'tray';
+tray.style.width = '100px';
+tray.style.position = 'absolute';
+tray.style.bottom = '-15px';
+tray.style.left = '0';
+tray.style.right = '0';
+tray.style.margin = 'auto';
+div.appendChild(tray);
       const label = document.createElement('div');
       label.className = 'reward';
       label.textContent = `+${reward}`;
