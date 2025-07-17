@@ -192,12 +192,15 @@
       font-size: 18px;
     }
 
-    #cookieGrid {
-      display: grid;
-      grid-template-columns: repeat(3, 100px);
-      gap: 5px;
-      justify-content: center;
-    }
+  #cookieGrid {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 20px; /* gives room for tray to sit */
+}
 
     .cookie {
   width: 100px;
