@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Simple Snake Game</title>
+<style>
+  /* Canvas full black background */
+  body {
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    color: white;
+  }
+  canvas {
+    background: #111;
+    display: block;
+    margin-top: 20px;
+    image-rendering: pixelated;
+    border: 2px solid #0f0;
+  }
+  #score {
+    margin-top: 15px;
+    font-size: 20px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Snake Game</h1>
+<canvas id="game" width="400" height="400"></canvas>
+<div id="score">Score: 0</div>
+
+<script>
+(() => {
+  const canvas = document.getElementById('game');
+  const ctx = canvas.getContext('2d');
+  const tileSize = 20; // size of each square (snake pixel, apple)
+  const tilesX = canvas.width / tileSize;
+  const tilesY = canvas.height / tileSize;
+
+  let snake = [{x: 10, y: 10}]; // initial position
+  let direction = {x: 0, y: 0};
+  let nextDirection = {x: 0, y: 0};
+  let apples = [];
+  let score = 0;
+
+  function sendScoreToParent() {
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'snakeScore', score: score }, '*');
+    }
+  }
+
+  // Apple types:
+  // normal apple = red (1 length)
+  // golden apple = yellow (doubles length)
+
+  function randomTile() {
+    return {
+      x: Math.floor(Math.random() * tilesX),
+      y: Math.floor(Math.random() * tilesY)
+    };
+  }
+
+  function spawnApple() {
+    // spawn apple randomly, 1 in 5 chance to be golden
+    let isGolden = Math.random() < 0.2;
+    let pos;
+    // make sure apple does not spawn on snake
+    do {
+      pos = randomTile();
+    } while (snake.some(s => s.x === pos.x && s.y === pos.y) || apples.some(a => a.x === pos.x && a.y === pos.y));
+    apples.push({x: pos.x, y: pos.y, golden: isGolden});
+  }
+
+  // Spawn the first apple
+  spawnApple();
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // draw snake
+    ctx.fillStyle = '#0f0';
+    snake.forEach(segment => {
+      ctx.fillRect(segment.x * tileSize, segment.y * tileSize, tileSize, tileSize);
+    });
+
+    // draw apples
+    apples.forEach(apple => {
+      ctx.fillStyle = apple.golden ? 'yellow' : 'red';
+      ctx.beginPath();
+      const cx = apple.x * tileSize + tileSize/2;
+      const cy = apple.y * tileSize + tileSize/2;
+      const radius = tileSize/2 * 0.8;
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
+
+  function moveSnake() {
+    if (nextDirection.x === -direction.x && nextDirection.y === -direction.y) {
+      // Prevent reversing direction immediately
+      // keep current direction
+    } else {
+      direction = nextDirection;
+    }
+
+    if (direction.x === 0 && direction.y === 0) {
+      // Not moving yet
+      return;
+    }
+
+    // Calculate new head position
+    const newHead = {
+      x: snake[0].x + direction.x,
+      y: snake[0].y + direction.y
+    };
+
+    // Check collisions with walls
+    if (newHead.x < 0 || newHead.x >= tilesX || newHead.y < 0 || newHead.y >= tilesY) {
+      gameOver();
+      return;
+    }
+
+    // Check collisions with self
+    if (snake.some(seg => seg.x === newHead.x && seg.y === newHead.y)) {
+      gameOver();
+      return;
+    }
+
+    snake.unshift(newHead); // add new head to snake
+
+    // Check if we ate an apple
+    const appleIndex = apples.findIndex(a => a.x === newHead.x && a.y === newHead.y);
+    if (appleIndex !== -1) {
+      const apple = apples[appleIndex];
+      score++;
+      document.getElementById('score').textContent = 'Score: ' + score;
+      sendScoreToParent();
+
+      if (apple.golden) {
+        // Double length: just add the current length again at tail
+        let currentLength = snake.length;
+        let tail = snake[snake.length - 1];
+        // We just add duplicate tail segments (they will follow naturally)
+        for(let i = 0; i < currentLength; i++) {
+          snake.push({...tail});
+        }
+      }
+      apples.splice(appleIndex, 1);
+      // Spawn a new apple after eating
+      spawnApple();
+    } else {
+      // Remove tail to keep length same if no apple eaten
+      snake.pop();
+    }
+  }
+
+  function gameOver() {
+    alert('Game Over! Your score: ' + score);
+    // Reset game
+    snake = [{x: 10, y: 10}];
+    direction = {x: 0, y: 0};
+    nextDirection = {x: 0, y: 0};
+    apples = [];
+    score = 0;
+    document.getElementById('score').textContent = 'Score: 0';
+    sendScoreToParent();
+    spawnApple();
+  }
+
+  window.addEventListener('keydown', e => {
+    switch(e.key.toLowerCase()) {
+      case 'w': nextDirection = {x: 0, y: -1}; break;
+      case 'a': nextDirection = {x: -1, y: 0}; break;
+      case 's': nextDirection = {x: 0, y: 1}; break;
+      case 'd': nextDirection = {x: 1, y: 0}; break;
+    }
+  });
+
+  // Game loop - 10 frames per second
+  setInterval(() => {
+    moveSnake();
+    draw();
+  }, 100);
+
+  // Send initial score 0 to parent on load
+  sendScoreToParent();
+})();
+</script>
+
+</body>
+</html>
