@@ -1,22 +1,5 @@
 /* Collection Progress Panel Styling */
-.earnMoreBtn {
-  background-color: #A5CEE6;       /* warm yellow, like a gacha UI */
-  border: 1px solid #3A6494;       /* black border */
-  border-radius: 10px;             /* rounded corners */
-  color: #000000;                  /* black text */
-  font-size: 18px;
-   ffont-family: "Ribeye", serif;
-  font-weight: 400;
-  font-style: normal;
-  padding: 4px 10px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
 
-.earnMoreBtn:hover {
-  background-color: #8BAED6;       /* lighter on hover */
-  transform: scale(1.1);           /* slight grow effect */
-}
 
 #collectionStatus {
   position: fixed;
