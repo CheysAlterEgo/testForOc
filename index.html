@@ -240,18 +240,21 @@
     }
     #trayContainer {
   position: relative;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  margin-top: -20px; /* pull it close under cookies */
-  pointer-events: none; /* allow clicks to pass through */
+  width: fit-content;
+  margin: -40px auto 0 auto; /* pulls it closer under the cookies */
+  pointer-events: none; /* allows clicking cookies through tray */
+  z-index: -1; /* stays behind the cookies */
 }
 
 #bigTray {
-  max-width: 100%;
+  width: 85%;  /* slightly smaller tray */
+  max-width: 450px;
   height: auto;
-  opacity: 0.95;
+  display: block;
+  margin: 0 auto;
+  opacity: 0.9;
 }
+
 
   </style>
 </head>
