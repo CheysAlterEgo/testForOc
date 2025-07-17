@@ -8,6 +8,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Federo&family=Ribeye&display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" href="hearticon.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Federo&display=swap" rel="stylesheet">
   <style>
      .card.glow-blue {
   box-shadow: 0 0 20px 5px rgba(63, 142, 252, 0.8);
@@ -43,7 +47,7 @@
   border-radius: 10px;             /* rounded corners */
   color: #000000;                  /* black text */
   font-size: 18px;
-   ffont-family: "Ribeye", serif;
+   font-family: "Ribeye", serif;
   font-weight: 400;
   font-style: normal;
   padding: 4px 10px;
@@ -213,6 +217,9 @@
     #cookieGame h2 {
       margin: 10px 0;
       font-size: 18px;
+      font-family: "Ribeye", serif;
+  font-weight: 400;
+  font-style: normal;
     }
 
  #cookieGrid {
@@ -278,7 +285,11 @@
   margin: 0 auto;
   opacity: 0.9;
 }
-
+.cookietext{
+   font-family: "Federo", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
 
   </style>
 </head>
@@ -286,10 +297,10 @@
 
  <div id="cookieGame">
   <h2>Pick a Cookie</h2>
-  <div id="countdown">Time left: 30s</div>
+  <div id="countdown"><p class="cookietext">Time left: 30s</p></div>
    <br>
   <div id="cookieGrid"></div>
- <div style="margin-top: 10px;">Coins: <span id="coinDisplay">0</span></div>
+ <p class="cookietext" style="margin-top: 10px;">Coins: <span id="coinDisplay">0</span></p>
 </div>
 
   <h1 id="title">Series Story Part 1</h1>
