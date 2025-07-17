@@ -103,10 +103,14 @@
       transition: transform 0.3s ease;
     }
 
-    .card-back img.zoomed {
-      transform: scale(1.6);
-      z-index: 10;
-    }
+   .card-back img {
+  transition: transform 0.3s ease;
+}
+
+.card:hover .card-back img {
+  transform: scale(1.6);
+  z-index: 10;
+}
 
     .blue { background-color: #3f8efc; }
     .yellow { background-color: #f9cc2f; }
@@ -413,9 +417,7 @@
           updateCollectionDisplay();
         });
 
-        img.addEventListener('dblclick', () => {
-          img.classList.toggle('zoomed');
-        });
+        
 
         container.appendChild(card);
       }
