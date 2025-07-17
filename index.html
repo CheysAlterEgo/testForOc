@@ -112,7 +112,7 @@
 }
 
 .card:hover .card-back img {
-  transform: scale(.7);
+  transform: scale(1.2);
   z-index: 1000;
 }
 
@@ -402,25 +402,29 @@
         card.appendChild(cardInner);
 
         card.addEventListener('click', () => {
-          card.classList.add('flipped');
+  // Prevent multiple clicks
+  if (card.classList.contains('flipped')) return;
 
-          // ✨ Add glow class based on rarity
-          if (item.rarity === '4') {
-            card.classList.add('glow-blue');
-          } else if (item.rarity === '5') {
-            card.classList.add('glow-yellow');
-          } else if (item.rarity === 'secret') {
-            card.classList.add('glow-purple');
-          }
+  card.classList.add('flipped');
 
-          card.classList.add('animate-glow');
-          const sound = document.getElementById('flipSound');
-          sound.currentTime = 0;
-          sound.play();
-          collection[item.name]++;
-          updateCollectionDisplay();
-        });
+  // ✨ Add glow class based on rarity
+  if (item.rarity === '4') {
+    card.classList.add('glow-blue');
+  } else if (item.rarity === '5') {
+    card.classList.add('glow-yellow');
+  } else if (item.rarity === 'secret') {
+    card.classList.add('glow-purple');
+  }
 
+  card.classList.add('animate-glow');
+
+  const sound = document.getElementById('flipSound');
+  sound.currentTime = 0;
+  sound.play();
+
+  collection[item.name]++;
+  updateCollectionDisplay();
+});
         
 
         container.appendChild(card);
