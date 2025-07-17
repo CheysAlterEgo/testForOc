@@ -239,7 +239,7 @@
       display: none;
     }
     #trayContainer {
-  position: relative;
+  position: absolute;
     top: 190px;
   width: fit-content;
   margin: -40px auto 0 auto; /* pulls it closer under the cookies */
@@ -265,12 +265,10 @@
   <h2>Pick a Cookie</h2>
   <div id="countdown">Time left: 30s</div>
   <div id="cookieGrid"></div>
-
-  <div id="trayContainer">
+ <div style="margin-top: 10px;">Coins: <span id="coinDisplay">0</span></div>
+   <div id="trayContainer">
     <img src="tray.png" alt="Tray" id="bigTray">
   </div>
-
-  <div style="margin-top: 10px;">Coins: <span id="coinDisplay">0</span></div>
 </div>
 
   <h1 id="title">Series Story Part 1</h1>
