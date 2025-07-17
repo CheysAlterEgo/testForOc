@@ -238,16 +238,36 @@
       margin-top: 10px;
       display: none;
     }
+    #trayContainer {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: -20px; /* pull it close under cookies */
+  pointer-events: none; /* allow clicks to pass through */
+}
+
+#bigTray {
+  max-width: 100%;
+  height: auto;
+  opacity: 0.95;
+}
+
   </style>
 </head>
 <body>
 
-  <div id="cookieGame">
-    <h2>Pick a Cookie</h2>
-    <div id="countdown">Time left: 30s</div>
-    <div id="cookieGrid"></div>
-    <div style="margin-top: 10px;">Coins: <span id="coinDisplay">0</span></div>
+ <div id="cookieGame">
+  <h2>Pick a Cookie</h2>
+  <div id="countdown">Time left: 30s</div>
+  <div id="cookieGrid"></div>
+
+  <div id="trayContainer">
+    <img src="tray.png" alt="Tray" id="bigTray">
   </div>
+
+  <div style="margin-top: 10px;">Coins: <span id="coinDisplay">0</span></div>
+</div>
 
   <h1 id="title">Series Story Part 1</h1>
   <img src="https://via.placeholder.com/300x200" alt="Main" class="main-img" />
@@ -303,16 +323,7 @@
     shuffled.forEach(reward => {
       const div = document.createElement('div');
       div.className = 'cookie';
-      const tray = document.createElement('img');
-tray.src = 'tray.png';
-tray.alt = 'tray';
-tray.style.width = '100px';
-tray.style.position = 'absolute';
-tray.style.bottom = '-15px';
-tray.style.left = '0';
-tray.style.right = '0';
-tray.style.margin = 'auto';
-div.appendChild(tray);
+      
       const label = document.createElement('div');
       label.className = 'reward';
       label.textContent = `+${reward}`;
