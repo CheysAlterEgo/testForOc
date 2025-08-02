@@ -1,1 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Silly Simulator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Federo&family=Ribeye&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="hearticon.png">
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Federo&display=swap" rel="stylesheet">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Yrsa:ital,wght@0,300..700;1,300..700&display=swap" rel="stylesheet">
+  <style>
+     .card.glow-blue {
+  box-shadow: 0 0 20px 5px rgba(63, 142, 252, 0.8);
+}
+
+.card.glow-yellow {
+  box-shadow: 0 0 20px 5px rgba(249, 204, 47, 0.8);
+}
+
+.card.glow-purple {
+  box-shadow: 0 0 20px 5px rgba(168, 95, 240, 0.8);
+}
+    body {
+      background-color: #f0f0f0;
+      margin: 0;
+      padding: 0;
+    }
+
+    h1 {
+      margin-top: 30px;
+      text-align: center;
+       font-family: "Yrsa", serif;
+  font-optical-sizing: auto;
+  font-weight:400;
+  font-style: normal;
+    }
+
+    .main-img {
+      width: 300px;
+      display: block;
+      margin: 20px auto;
+    }
+.earnMoreBtn {
+  background-color: #A5CEE6;       /* warm yellow, like a gacha UI */
+  border: 1px solid #3A6494;       /* black border */
+  border-radius: 10px;             /* rounded corners */
+  color: #000000;                  /* black text */
+  font-size: 18px;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.earnMoreBtn:hover {
+  background-color: #8BAED6;       /* lighter on hover */
+  transform: scale(1.1);           /* slight grow effect */
+}
+    .button-container {
+      text-align: center;
+      margin: 20px;
+    }
+
+    button {
+      margin: 0 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .boxes {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .card {
+      width: 280px;
+      height: 280px;
+      perspective: 1000px;
+       position: relative;
+  z-index: 1;
+    }
+
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.8s;
+      transform-style: preserve-3d;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .card.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-front, .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 10px;
+    }
+
+    .card-front {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card-back {
+      background: white;
+      transform: rotateY(180deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+   .card-back img {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 10px;
+  transition: transform 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+   .card-back img {
+  transition: transform 0.3s ease;
+}
+
+.card:hover .card-back img {
+  transform: scale(1.2);
+  z-index: 1000;
+}
+
+    .blue { background-color: #3f8efc; }
+    .yellow { background-color: #f9cc2f; }
+    .purple { background-color: #a85ff0; }
+
+    .loading {
+      font-size: 20px;
+      margin-top: 20px;
+      text-align: center;
+      animation: pulse 1s infinite;
+      color: #555;
+    }
+
+    #collectionStatus {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: white;
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 5px;
+      text-align: left;
+      width: 220px;
+      font-family: "Ribeye", serif;
+  font-weight: 400;
+  font-style: normal;
+    }
+
+    .uncollected {
+      color: #aaa;
+    }
+
+    .progress-bar {
+      height: 10px;
+      background: #ddd;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: #e072b6;
+      transition: width 0.5s ease-in-out;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.3; }
+      50% { opacity: 1; }
+      100% { opacity: 0.3; }
+    }
+
+    .animate-glow {
+      animation: glowBase 1s ease forwards;
+    }
+
+    @keyframes glowBase {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    #cookieGame {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  background: transparent; /* was #fff6ec */
+  border-radius: 0;         /* removed rounding */
+  box-shadow: none;         /* removed shadow */
+  padding: 0;               /* removed padding */
+  width: auto;              /* removed fixed width */
+}
+
+
+    #cookieGame h2 {
+      margin: 10px 0;
+      font-size: 18px;
+      font-family: "Ribeye", serif;
+  font-weight: 400;
+  font-style: normal;
+    }
+
+ #cookieGrid {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      gap: 5px;
+      justify-content: center;
+    }
+
+    .cookie {
+  width: 100px;
+  height: 100px;
+  background-image: url('bettercookie.png'); /* updated */
+  background-size: cover;
+  border-radius: 50%;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.3s;
+}
+
+
+    .cookie.clicked {
+      box-shadow: 0 0 15px 5px #f5b942;
+      transform: scale(1.05);
+    }
+
+    .cookie .reward {
+      position: absolute;
+      top: 35%;
+      left: 0;
+      right: 0;
+      color: black;
+      font-weight: bold;
+      font-size: 20px;
+      display: none;
+      text-align: center;
+    }
+
+    .cookie.revealed .reward {
+      display: block;
+    }
+
+    #notEnough {
+      color: red;
+      font-weight: bold;
+      margin-top: 10px;
+      display: none;
+    }
+    #trayContainer {
+  position: absolute;
+    top: 190px;
+  width: fit-content;
+  margin: -40px auto 0 auto; /* pulls it closer under the cookies */
+  pointer-events: none; /* allows clicking cookies through tray */
+  z-index: -1; /* stays behind the cookies */
+}
+
+#bigTray {
+  width: 85%;  /* slightly smaller tray */
+  max-width: 450px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  opacity: 0.9;
+}
+.cookietext{
+   font-family: "Federo", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+  </style>
+</head>
+<body>
+  <a href="test.html">Other page temp link </a>
+ <div id="cookieGame">
+  <h2>Pick a Cookie</h2>
+  <div id="countdown"><p class="cookietext">Time left: 30s</p></div>
+   <br>
+  <div id="cookieGrid"></div>
+ <p class="cookietext" style="margin-top: 10px;">Coins: <span id="coinDisplay">0</span></p>
+</div>
+
+  <h1 id="title">Layer 1</h1>
+  <img src="main.png" alt="Main" class="main-img" />
+  <div class="button-container">
+    <button class= "earnMoreBtn" onclick="doPull(1)">1 Pull</button>
+    <button class= "earnMoreBtn" onclick="doPull(5)">5 Pull</button>
+    <div id="notEnough">You don't have enough coins!</div>
+  </div>
+
+  <div id="loading" class="loading" style="display: none;">Loading...</div>
+  <div class="boxes" id="resultContainer"></div>
+  <div id="collectionStatus"></div>
+
+  <audio id="flipSound" src="click.mp3"></audio>
+
+ <script>
+  const items = [
+    { name: 'Mika', rarity: '4', image: 'mika.png' },
+    { name: 'Shoya', rarity: '4', image: 'shoya.png' },
+    { name: 'Melanie', rarity: '4', image: 'melanie.png' },
+    { name: 'Damian', rarity: '4', image: 'damain.png' },
+    { name: 'Matt', rarity: '4', image: 'matt.png' },
+    { name: 'Susurri', rarity: '4', image: 'susurri.PNG' },
+    { name: 'Stella', rarity: '4', image: 'stella.png' },
+    { name: 'Yumiko', rarity: '5', image: 'yum.png' },
+    { name: 'Aiko', rarity: '5', image: 'aiko.png' },
+    { name: 'Luna', rarity: '5', image: 'luna.png' },
+    { name: 'Hyun', rarity: '5', image: 'hyun.png' },
+    { name: 'Moon', rarity: '5', image: 'moon.png' },
+    { name: 'Vivian', rarity: '5', image: 'vivian.png' },
+    { name: 'Andrew', rarity: 'secret', image: 'andrew.png' }
+  ];
+
+  let coinCount = 10;
+  const COOKIE_REWARDS = [1, 1, 5, 5, 5, 10];
+  let cookiesClickable = true;
+  let countdown = 5;
+  let countdownInterval;
+
+  const coinDisplay = document.getElementById('coinDisplay');
+  const cookieGrid = document.getElementById('cookieGrid');
+  const countdownDisplay = document.getElementById('countdown');
+  const notEnoughMsg = document.getElementById('notEnough');
+
+  function updateCoinDisplay() {
+    coinDisplay.textContent = coinCount;
+  }
+
+  function createCookies() {
+    cookieGrid.innerHTML = '';
+    const shuffled = [...COOKIE_REWARDS].sort(() => Math.random() - 0.5);
+
+    shuffled.forEach(reward => {
+      const div = document.createElement('div');
+      div.className = 'cookie';
+      
+      const label = document.createElement('div');
+      label.className = 'reward';
+      label.textContent = `+${reward}`;
+      div.appendChild(label);
+      cookieGrid.appendChild(div);
+
+      div.addEventListener('click', () => {
+        if (!cookiesClickable) return;
+        cookiesClickable = false;
+        div.classList.add('clicked');
+        label.style.display = 'block';
+        coinCount += reward;
+        updateCoinDisplay();
+
+        [...cookieGrid.children].forEach(c => {
+          const l = c.querySelector('.reward');
+          l.style.display = 'block';
+        });
+
+        countdown = 30;
+        countdownInterval = setInterval(() => {
+          countdown--;
+          countdownDisplay.textContent = `Time left: ${countdown}s`;
+          if (countdown <= 0) {
+            clearInterval(countdownInterval);
+            cookiesClickable = true;
+            createCookies();
+          }
+        }, 1000);
+      });
+    });
+  }
+
+  createCookies();
+  updateCoinDisplay();
+
+  const collection = {};
+  items.forEach(item => collection[item.name] = 0);
+
+  function updateCollectionDisplay() {
+    const container = document.getElementById('collectionStatus');
+    let collectedCount = 0;
+    let content = '<strong>Collection Progress:</strong><ul style="list-style:none; padding:0;">';
+
+    items.forEach(item => {
+      const count = collection[item.name];
+      const owned = count > 0;
+      if (owned) collectedCount++;
+      content += `<li class="${owned ? '' : 'uncollected'}">${item.name}${count > 1 ? ' (' + count + ')' : ''}</li>`;
+    });
+
+    content += '</ul>';
+    const progressPercent = (collectedCount / items.length) * 100;
+    content += `<div class="progress-bar"><div class="progress-bar-fill" style="width:${progressPercent}%"></div></div>`;
+    container.innerHTML = content;
+  }
+
+  function getRandomItem() {
+    const roll = Math.random();
+    if (roll < 0.75) return items.filter(i => i.rarity === '4')[Math.floor(Math.random() * 7)];
+    if (roll < 0.95) return items.filter(i => i.rarity === '5')[Math.floor(Math.random() * 6)];
+    return items.find(i => i.rarity === 'secret');
+  }
+
+  function doPull(count) {
+    if (coinCount < count) {
+      notEnoughMsg.style.display = 'block';
+      setTimeout(() => notEnoughMsg.style.display = 'none', 2000);
+      return;
+    }
+
+    coinCount -= count;
+    updateCoinDisplay();
+
+    const container = document.getElementById('resultContainer');
+    const loader = document.getElementById('loading');
+    container.innerHTML = '';
+    loader.style.display = 'block';
+
+    setTimeout(() => {
+      loader.style.display = 'none';
+      for (let i = 0; i < count; i++) {
+        const item = getRandomItem();
+        const card = document.createElement('div');
+        card.className = 'card';
+        const cardInner = document.createElement('div');
+        cardInner.className = 'card-inner';
+        const cardFront = document.createElement('div');
+        cardFront.className = 'card-front ' + (item.rarity === '4' ? 'blue' : item.rarity === '5' ? 'yellow' : 'purple');
+        const cardBack = document.createElement('div');
+        cardBack.className = 'card-back';
+        const img = document.createElement('img');
+        img.src = item.image;
+        img.alt = item.name;
+        img.title = item.name;
+        cardBack.appendChild(img);
+        cardInner.appendChild(cardFront);
+        cardInner.appendChild(cardBack);
+        card.appendChild(cardInner);
+
+        card.addEventListener('click', () => {
+  // Prevent multiple clicks
+  if (card.classList.contains('flipped')) return;
+
+  card.classList.add('flipped');
+
+  // ✨ Add glow class based on rarity
+  if (item.rarity === '4') {
+    card.classList.add('glow-blue');
+  } else if (item.rarity === '5') {
+    card.classList.add('glow-yellow');
+  } else if (item.rarity === 'secret') {
+    card.classList.add('glow-purple');
+  }
+
+  card.classList.add('animate-glow');
+
+  const sound = document.getElementById('flipSound');
+  sound.currentTime = 0;
+  sound.play();
+
+  collection[item.name]++;
+  updateCollectionDisplay();
+});
+        
+
+        container.appendChild(card);
+      }
+    }, 1500);
+  }
+</script>
+</body>
+</html>
