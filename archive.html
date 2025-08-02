@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Archive</title>
+<style>
+  /* Fonts & base */
+  @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap');
+  
+  body {
+    margin: 0;
+    font-family: 'Quicksand', sans-serif;
+    background: linear-gradient(to bottom right, #d0e7ff, #f0f8ff);
+    color: #05386b;
+    min-height: 100vh;
+    padding: 40px 30px;
+    box-sizing: border-box;
+  }
+
+  h1, h2 {
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  h1 {
+    font-size: 2.8rem;
+    margin-bottom: 30px;
+    text-align: center;
+  }
+
+  h2 {
+    color: #004080;
+    margin-top: 40px;
+    border-bottom: 2px solid #aaccee;
+    padding-bottom: 6px;
+  }
+
+  /* Container for each Part */
+  .part-section {
+    max-width: 1500px;
+    margin: 0 auto 60px auto;
+  }
+
+  /* Rarity group container */
+  .rarity-group {
+    margin-top: 20px;
+  }
+
+  .rarity-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #2274a5;
+    border-left: 5px solid #90caf9;
+    padding-left: 10px;
+  }
+
+  /* Cards container */
+  .cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: flex-start;
+  }
+
+  /* Card basics */
+  .card {
+    background: #ffffffdd;
+    width: 180px;
+    height: 180px;
+    perspective: 1000px;
+    border-radius: 16px;
+    box-shadow: 0 6px 12px rgba(0, 56, 120, 0.15);
+    cursor: pointer;
+  }
+
+  /* Inner card for flipping */
+  .card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+    border-radius: 16px;
+  }
+
+  /* Flipped state */
+  .card.flipped .card-inner {
+    transform: rotateY(180deg);
+  }
+
+  /* Front and back sides */
+  .card-front, .card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 16px;
+    backface-visibility: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 10px;
+  }
+
+  /* Front side: name on a styled card back */
+  .card-front {
+    background: linear-gradient(135deg, #a0c8ff, #4a8fed);
+    color: white;
+    font-weight: 700;
+    font-size: 1.15rem;
+    text-align: center;
+    box-shadow:
+      inset 0 4px 10px rgba(255,255,255,0.5),
+      0 6px 8px rgba(0, 70, 160, 0.3);
+    user-select: none;
+  }
+
+  /* Back side: character image */
+  .card-back {
+     background: white;
+    transform: rotateY(180deg);
+    box-shadow: inset 0 0 30px #a0c8ff;
+  }
+
+  .card-back img {
+   width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 16px;
+  }
+
+  /* Rarity coloring for front backgrounds */
+  .rarity-4star .card-front {
+    background: linear-gradient(135deg, #8ab6ff, #467fdb);
+  }
+
+  .rarity-5star .card-front {
+    background: linear-gradient(135deg, #ffcb6e, #f4a261);
+  }
+
+  .rarity-secret .card-front {
+    background: linear-gradient(135deg, #d39bf6, #a765c9);
+  }
+
+  /* Responsive */
+  @media (max-width: 480px) {
+    .cards {
+      justify-content: center;
+    }
+  }
+
+</style>
+</head>
+<body>
+
+  <h1>Archive - Silly Gacha OC Pull</h1>
+
+  <!-- Part 1 -->
+  <section class="part-section" id="part1">
+    <h2>Part 1</h2>
+
+    <div class="rarity-group rarity-4star">
+      <div class="rarity-title">4-Star</div>
+      <div class="cards">
+        <div class="card">
+          <div class="card-inner">
+            <div class="card-front">Mika</div>
+            <div class="card-back"><img src="mika.png" alt="Mika"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-inner">
+            <div class="card-front">Shoya</div>
+            <div class="card-back"><img src="shoya.png" alt="Shoya"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-inner">
+            <div class="card-front">Melanie</div>
+            <div class="card-back"><img src="melanie.png" alt="Melanie"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-inner">
+            <div class="card-front">Damian</div>
+            <div class="card-back"><img src="damian.png" alt="Damian"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-inner">
+            <div class="card-front">Matt</div>
+            <div class="card-back"><img src="matt.png" alt="Matt"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-inner">
+            <div class="card-front">Susurri</div>
+            <div class="card-back"><img src="susurri.png" alt="Susurri"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-inner">
+            <div class="card-front">Stella</div>
+            <div class="card-back"><img src="stella.png" alt="Stella"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rarity-group rarity-5star">
+      <div class="rarity-title">5-Star</div>
+      <div class="cards">
+        <div class="card">
+          <div class="card-inner">
+            <div class="card-front">Luna</div>
+            <div class="card-back"><img src="luna.png" alt="Luna"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-inner">
+            <div class="card-front">Aiko</div>
+            <div class="card-back"><img src="aiko.png" alt="Aiko"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-inner">
+            <div class="card-front">Yumiko</div>
+            <div class="card-back"><img src="yumiko.png" alt="Yumiko"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-inner">
+            <div class="card-front">Hyun</div>
+            <div class="card-back"><img src="hyun.png" alt="Hyun"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-inner">
+            <div class="card-front">Moon</div>
+            <div class="card-back"><img src="moon.png" alt="Moon"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-inner">
+            <div class="card-front">Vivian</div>
+            <div class="card-back"><img src="vivian.png" alt="Vivian"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rarity-group rarity-secret">
+      <div class="rarity-title">Secret</div>
+      <div class="cards">
+        <div class="card">
+          <div class="card-inner">
+            <div class="card-front">Andrew</div>
+            <div class="card-back"><img src="andrew.png" alt="Andrew"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Part 2 -->
+  <section class="part-section" id="part2">
+    <h2>Part 2</h2>
+
+    <div class="rarity-group rarity-4star">
+      <div class="rarity-title">4-Star</div>
+      <div class="cards">
+        <div class="card"><div class="card-inner"><div class="card-front">Stella</div><div class="card-back"><img src="stellap2.png" alt="Stella"></div></div></div>
+        <div class="card"><div class="card-inner"><div class="card-front">Nikki</div><div class="card-back"><img src="nikki.png" alt="Nikki"></div></div></div>
+        <div class="card"><div class="card-inner"><div class="card-front">Jamie</div><div class="card-back"><img src="jamie.png" alt="Jamie"></div></div></div>
+        <div class="card"><div class="card-inner"><div class="card-front">The Twins</div><div class="card-back"><img src="twins.png" alt="The Twins"></div></div></div>
+        <div class="card"><div class="card-inner"><div class="card-front">Soyul</div><div class="card-back"><img src="soyul.png" alt="Soyul"></div></div></div>
+        <div class="card"><div class="card-inner"><div class="card-front">Damian</div><div class="card-back"><img src="damianp2.png" alt="Damian"></div></div></div>
+      </div>
+    </div>
+
+    <div class="rarity-group rarity-5star">
+      <div class="rarity-title">5-Star</div>
+      <div class="cards">
+        <div class="card"><div class="card-inner"><div class="card-front">Aiko</div><div class="card-back"><img src="aikop2.png" alt="Aiko"></div></div></div>
+        <div class="card"><div class="card-inner"><div class="card-front">Luna</div><div class="card-back"><img src="lunap2.png" alt="Luna"></div></div></div>
+        <div class="card"><div class="card-inner"><div class="card-front">Vex</div><div class="card-back"><img src="vex.png" alt="Vex"></div></div></div>
+        <div class="card"><div class="card-inner"><div class="card-front">Yumiko</div><div class="card-back"><img src="yumikop2.png" alt="Yumiko"></div></div></div>
+        <div class="card"><div class="card-inner"><div class="card-front">Arma</div><div class="card-back"><img src="arma.png" alt="Arma"></div></div></div>
+        <div class="card"><div class="card-inner"><div class="card-front">Melanie</div><div class="card-back"><img src="melaniep2.png" alt="Melanie"></div></div></div>
+        <div class="card"><div class="card-inner"><div class="card-front">Vivian</div><div class="card-back"><img src="vivian.png" alt="Vivian"></div></div></div>
+      </div>
+    </div>
+
+    <div class="rarity-group rarity-secret">
+      <div class="rarity-title">Secret</div>
+      <div class="cards">
+        <div class="card"><div class="card-inner"><div class="card-front">Yunsu</div><div class="card-back"><img src="yunsu.png" alt="Yunsu"></div></div></div>
+        <div class="card"><div class="card-inner"><div class="card-front">Minjung</div><div class="card-back"><img src="minjung.png" alt="Minjun"></div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Part 3 -->
+  <section class="part-section" id="part3">
+    <h2>Part 3</h2>
+
+    <div class="rarity-group rarity-4star">
+      <div class="rarity-title">4-Star</div>
+      <div class="cards">
+        <div class="card"><div class="card-inner"><div class="card-front">Miran</div><div class="card-back"><img src="images/miran.png" alt="Miran"></div></div></div>
+        <div class="card"><div class="card-inner"><div class="card-front">Viola</div><div class="card-back"><img src="images/viola.png" alt="Viola"></div></div></div>
+        <div class="card"><div class="card-inner"><div class="card-front">Soyul</div><div class="card-back"><img src="images/soyul.png" alt="Soyul"></div></div></div>
+      </div>
+    </div>
+
+    <div class="rarity-group rarity-5star">
+      <div class="rarity-title">5-Star</div>
+      <div class="cards">
+        <div class="card"><div class="card-inner"><div class="card-front">Vex</div><div class="card-back"><img src="images/vex.png" alt="Vex"></div></div></div>
+        <div class="card"><div class="card-inner"><div class="card-front">Celestino</div><div class="card-back"><img src="images/celestino.png" alt="Celestino"></div></div></div>
+        <div class="card"><div class="card-inner"><div class="card-front">Deviora</div><div class="card-back"><img src="images/deviora.png" alt="Deviora"></div></div></div>
+        <div class="card"><div class="card-inner"><div class="card-front">Kairo</div><div class="card-back"><img src="images/cairo.png" alt="Cairo"></div></div></div>
+        <div class="card"><div class="card-inner"><div class="card-front">Anaka</div><div class="card-back"><img src="images/anakka.png" alt="Anakka"></div></div></div>
+        <div class="card"><div class="card-inner"><div class="card-front">Yunsu</div><div class="card-back"><img src="images/hyunsoo.png" alt="Hyunsoo"></div></div></div>
+      </div>
+    </div>
+
+    <div class="rarity-group rarity-secret">
+      <div class="rarity-title">Secret</div>
+      <div class="cards">
+        <div class="card"><div class="card-inner"><div class="card-front">Alina</div><div class="card-back"><img src="images/alina.png" alt="Alina"></div></div></div>
+      </div>
+    </div>
+  </section>
+
+<script>
+  // Flip card toggle on click
+  document.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('click', () => {
+      card.classList.toggle('flipped');
+    });
+  });
+</script>
+
+</body>
+</html>
