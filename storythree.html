@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Animara</title>
+  <title>Animara's Creation</title>
   <link rel="icon" type="image/png" href="hearticon.png">
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Federo&family=Ribeye&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Yrsa:ital,wght@0,300..700;1,300..700&display=swap" rel="stylesheet">
   <style>
+    /* Your existing styles unchanged... */
     body {
       background-color: #f0f0f0;
       margin: 0;
@@ -157,26 +158,105 @@
       display: none;
       margin-top: 10px;
     }
-    #snake-container {
+    #simon-container {
       position: fixed;
       top: 10px;
       left: 10px;
       width: 430px;
-      height: 375px;
+      background: white;
+      border: 2px solid #aaa;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
     #score, #coinDisplay {
-     font-family: "Yrsa", serif;
+      font-family: "Yrsa", serif;
       font-weight: 400;
       text-align: center;
       margin-top: 5px;
-      
+    }
+    #simonGame h1 {
+      text-align: center;
+      color: #e91e63;
+      margin: 5px 0;
+    }
+    #difficulty-select {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .difficulty-btn {
+      padding: 6px 12px;
+      margin: 0 4px;
+      border: none;
+      border-radius: 8px;
+      background: #f48fb1;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s;
+      font-size: 14px;
+    }
+    .difficulty-btn:hover {
+      background: #ec407a;
+    }
+    .difficulty-btn:disabled {
+      background: #e0e0e0;
+      color: #888;
+      cursor: not-allowed;
+    }
+    #game-board {
+      display: grid;
+      grid-template-columns: repeat(2, 90px);
+      grid-gap: 15px;
+      justify-content: center;
+      margin-top: 10px;
+    }
+    .btn {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      border: 4px solid white;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+      cursor: pointer;
+      opacity: 0.9;
+      transition: transform 0.1s, opacity 0.2s;
+    }
+    .btn:active {
+      transform: scale(0.95);
+    }
+    .red { background: #ff6b6b; }
+    .green { background: #81c784; }
+    .blue { background: #64b5f6; }
+    .yellow { background: #fff176; }
+    .active {
+      opacity: 1;
+      box-shadow: 0 0 30px white, 0 0 10px #000;
+      transform: scale(1.1);
     }
   </style>
 </head>
 <body>
 
-  <div id="snake-container">
-    <iframe id="snakeIframe" src="simonsays.html" width="470" height="380" style="border:none;"></iframe>
+  <div id="simon-container">
+    <div id="simonGame" style="width: 430px; height: 375px;">
+      <h1>Simon Says 🌸</h1>
+
+      <div id="difficulty-select">
+        <button class="difficulty-btn" onclick="startGame('easy')">Easy</button>
+        <button class="difficulty-btn" onclick="startGame('medium')">Medium</button>
+        <button class="difficulty-btn" onclick="startGame('hard')">Hard</button>
+      </div>
+
+      <div id="game-board">
+        <div class="btn red" data-color="red"></div>
+        <div class="btn green" data-color="green"></div>
+        <div class="btn blue" data-color="blue"></div>
+        <div class="btn yellow" data-color="yellow"></div>
+      </div>
+
+      <audio id="patternSound" src="simoncolor.mp3"></audio>
+      <audio id="clickSound" src="simoncolor.mp3"></audio>
+    </div>
     <div id="score">Score: 0</div>
     <div id="coinDisplay">Coins: 10</div>
   </div>
@@ -196,13 +276,131 @@
   <audio id="flipSound" src="click.mp3"></audio>
 
   <script>
+    // Simon Says game variables
+    const simonColors = ["red", "green", "blue", "yellow"];
+    let simonSequence = [], simonUserSequence = [];
+    let simonScore = 0;              // track successful rounds
+    let simonClickable = false;
+    let simonCoinGain = 1;
+    let simonStarted = false;
+    let simonOver = false;
+    let simonDifficulty = "easy";
+
+    const simonButtons = document.querySelectorAll("#game-board .btn");
+    const simonPatternSound = document.getElementById("patternSound");
+    const simonClickSound = document.getElementById("clickSound");
+    const simonDiffBtns = document.querySelectorAll(".difficulty-btn");
+
+    simonButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        if (!simonClickable || simonOver) return;
+        const color = btn.dataset.color;
+        simonUserSequence.push(color);
+        simonFlash(btn);
+        simonClickSound.currentTime = 0;
+        simonClickSound.play();
+        simonCheckInput();
+      });
+    });
+
+    function startGame(diff) {
+      if (simonStarted) return;
+      simonOver = false;
+      simonStarted = true;
+      simonDifficulty = diff;
+      simonSequence = [];
+      simonUserSequence = [];
+      simonScore = 0;  // reset internal game score on new game
+      updateSimonScoreDisplay();
+      simonLockBtns();
+
+      simonCoinGain = diff === "medium" ? 3 : diff === "hard" ? 5 : 1;
+      const rounds = diff === "medium" ? 2 : diff === "hard" ? 3 : 1;
+      for (let i = 0; i < rounds; i++) simonAddToSequence();
+      simonPlaySequence();
+    }
+
+    function simonLockBtns() {
+      simonDiffBtns.forEach(btn => btn.disabled = true);
+    }
+
+    function simonUnlockBtns() {
+      simonDiffBtns.forEach(btn => btn.disabled = false);
+    }
+
+    function simonAddToSequence() {
+      const color = simonColors[Math.floor(Math.random() * simonColors.length)];
+      simonSequence.push(color);
+    }
+
+    function simonNextRound() {
+      simonClickable = false;
+      simonUserSequence = [];
+      if (simonDifficulty === "hard") {
+        simonAddToSequence();
+        simonAddToSequence();
+      } else {
+        simonAddToSequence();
+      }
+      simonPlaySequence();
+    }
+
+    function simonPlaySequence() {
+      simonClickable = false;
+      let delay = 0;
+      simonSequence.forEach((color, idx) => {
+        setTimeout(() => {
+          if (simonOver) return;
+          const btn = document.querySelector(`#game-board .btn.${color}`);
+          simonFlash(btn);
+          simonPatternSound.currentTime = 0;
+          simonPatternSound.play();
+        }, 700 * idx);
+        delay = 700 * (idx + 1);
+      });
+      setTimeout(() => {
+        if (!simonOver) simonClickable = true;
+      }, delay);
+    }
+
+    function simonFlash(btn) {
+      btn.classList.add("active");
+      setTimeout(() => btn.classList.remove("active"), 400);
+    }
+
+    function simonCheckInput() {
+      const idx = simonUserSequence.length - 1;
+      if (simonUserSequence[idx] !== simonSequence[idx]) {
+        alert("❌ Wrong pattern! Game over.");
+        simonClickable = false;
+        simonStarted = false;
+        simonOver = true;
+        simonUnlockBtns();
+        return;
+      }
+      if (simonUserSequence.length === simonSequence.length) {
+        simonScore++;
+        simonCoinsEarned = simonCoinGain; // coins to add per successful round
+        // Add coins only now, after success:
+        coinCount += simonCoinsEarned;
+        updateCoinDisplay();
+
+        updateSimonScoreDisplay();
+        setTimeout(() => {
+          if (!simonOver) simonNextRound();
+        }, 1000);
+      }
+    }
+
+    function updateSimonScoreDisplay() {
+      document.getElementById("score").textContent = "Score: " + simonScore;
+    }
+
+    // Items & Gacha setup
     const items = [
       { name: 'Stella', rarity: '4', image: 'stellap2.png' },
       { name: 'Nikki', rarity: '4', image: 'nikki.PNG' },
       { name: 'Jamie', rarity: '4', image: 'jamie.png' },
-      { name: 'The Twins', rarity: '4', image: 'twins.png' },
-      { name: 'Soyul', rarity: '4', image: 'soyulp2.PNG' },
-      { name: 'Damian', rarity: '4', image: 'damianp2.png' },
       { name: 'Aiko', rarity: '5', image: 'aikop2.png' },
       { name: 'Luna', rarity: '5', image: 'lunap2.png' },
       { name: 'Vex', rarity: '5', image: 'vexp2.png' },
@@ -210,8 +408,7 @@
       { name: 'Arma', rarity: '5', image: 'moon.png' },
       { name: 'Melanie', rarity: '5', image: 'melanie.png' },
       { name: 'Vivian', rarity: '5', image: 'vivianp2.png' },
-      { name: 'Yunsu', rarity: 'secret', image: 'andrew.png' },
-      {name: 'Minjung', rarity: 'secret', image: 'andrew.png' }
+      { name: 'Yunsu', rarity: 'secret', image: 'andrew.png' }
     ];
 
     let coinCount = 10;
@@ -230,7 +427,7 @@
     function updateCollectionDisplay() {
       const container = document.getElementById('collectionStatus');
       let collectedCount = 0;
-      let content = '<strong>Collection Progress:</strong><ul style="list-style:none;">';
+      let content = '<strong>Collection Progress:</strong><ul style="list-style:none; padding-left: 0;">';
 
       items.forEach(item => {
         const count = collection[item.name];
@@ -245,17 +442,16 @@
       container.innerHTML = content;
     }
 
-   function getRandomItem() {
-  const roll = Math.random();
-  const fourStars = items.filter(i => i.rarity === '4');
-  const fiveStars = items.filter(i => i.rarity === '5');
-  const secrets = items.filter(i => i.rarity === 'secret');
+    function getRandomItem() {
+      const roll = Math.random();
+      const fourStars = items.filter(i => i.rarity === '4');
+      const fiveStars = items.filter(i => i.rarity === '5');
+      const secrets = items.filter(i => i.rarity === 'secret');
 
-  if (roll < 0.75) return fourStars[Math.floor(Math.random() * fourStars.length)];
-  if (roll < 0.95) return fiveStars[Math.floor(Math.random() * fiveStars.length)];
-  return secrets[Math.floor(Math.random() * secrets.length)];
-}
-
+      if (roll < 0.3) return fourStars[Math.floor(Math.random() * fourStars.length)];
+      if (roll < 0.9) return fiveStars[Math.floor(Math.random() * fiveStars.length)];
+      return secrets[Math.floor(Math.random() * secrets.length)];
+    }
 
     function doPull(count) {
       if (coinCount < count) {
@@ -308,19 +504,10 @@
       }, 1500);
     }
 
-    // Message from snake game iframe
-    window.addEventListener('message', event => {
-      if (event.data && event.data.type === 'score') {
-        const score = event.data.score;
-        document.getElementById('score').textContent = 'Snake Score: ' + score;
-        coinCount += score;
-        updateCoinDisplay();
-      }
-    });
-
-    // Initial setup
+    // Initialize displays on page load
     updateCollectionDisplay();
     updateCoinDisplay();
+
   </script>
 
 </body>
