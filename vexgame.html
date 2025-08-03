@@ -203,6 +203,8 @@
     <button id="introOkayBtn">Okay, Let’s Play</button>
   </div>
 </div>
+<audio id="bgMusic" src="backgroundmusic.wav" loop></audio>
+<audio id="clickSound" src="simonclick.wav"></audio>
 
 
   <!-- Leaderboard OUTSIDE gameBox -->
@@ -227,6 +229,9 @@
   <button id="restartBtn">Try Again</button>
 
   <script>
+    const bgMusic = document.getElementById("bgMusic");
+const clickSound = document.getElementById("clickSound");
+
     window.addEventListener("load", () => {
   const modal = document.getElementById("introModal");
   const okayBtn = document.getElementById("introOkayBtn");
@@ -315,6 +320,9 @@ function spawnMultipleTargets() {
     target.style.top = y + "px";
 
     target.addEventListener("click", () => {
+      clickSound.currentTime = 0;
+clickSound.play();
+      
       if (type === "yumiko") {
         score = Math.max(0, score - 5);
         hearts--;
@@ -369,6 +377,7 @@ function spawnMultipleTargets() {
     }
 
     function endGame() {
+      bgMusic.pause();
       gameOver = true;
       clearInterval(interval);
       clearInterval(spawnInterval);
