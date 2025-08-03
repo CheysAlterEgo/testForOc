@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Simon Says Game</title>
+  <style>
+    body {
+      background: #fff0f5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Arial Rounded MT Bold', 'Arial', sans-serif;
+      height: 100vh;
+      margin: 0;
+    }
+
+    h1 {
+      margin-top: 10px;
+      color: #e91e63;
+    }
+
+    #score {
+      font-size: 18px;
+      margin: 10px 0;
+      color: #555;
+    }
+
+    #difficulty-select {
+      margin-bottom: 20px;
+    }
+
+    .difficulty-btn {
+      padding: 8px 16px;
+      margin: 0 5px;
+      border: none;
+      border-radius: 8px;
+      background: #f48fb1;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+
+    .difficulty-btn:hover {
+      background: #ec407a;
+    }
+
+    .difficulty-btn:disabled {
+      background: #e0e0e0;
+      color: #888;
+      cursor: not-allowed;
+    }
+
+    #game-board {
+      display: grid;
+      grid-template-columns: repeat(2, 120px);
+      grid-gap: 25px;
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 4px solid white;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+      cursor: pointer;
+      opacity: 0.9;
+      transition: transform 0.1s, opacity 0.2s;
+    }
+
+    .btn:active {
+      transform: scale(0.95);
+    }
+
+    .red { background: #ff6b6b; }
+    .green { background: #81c784; }
+    .blue { background: #64b5f6; }
+    .yellow { background: #fff176; }
+
+    .active {
+      opacity: 1;
+      box-shadow: 0 0 30px white, 0 0 10px #000;
+      transform: scale(1.1);
+    }
+  </style>
+</head>
+<body>
+  <h1>Simon Says 🌸</h1>
+
+  <div id="difficulty-select">
+    <button class="difficulty-btn" onclick="startGame('easy')">Easy</button>
+    <button class="difficulty-btn" onclick="startGame('medium')">Medium</button>
+    <button class="difficulty-btn" onclick="startGame('hard')">Hard</button>
+  </div>
+
+  <div id="score">Coins: 0</div>
+
+  <div id="game-board">
+    <div class="btn red" data-color="red"></div>
+    <div class="btn green" data-color="green"></div>
+    <div class="btn blue" data-color="blue"></div>
+    <div class="btn yellow" data-color="yellow"></div>
+  </div>
+
+  <audio id="patternSound" src="simoncolor.mp3"></audio>
+  <audio id="clickSound" src="simonclick.wav"></audio>
+
+<script>
+  const colors = ["red", "green", "blue", "yellow"];
+  let sequence = [];
+  let userSequence = [];
+  let coins = 0;
+  let clickable = false;
+  let coinGain = 1;
+  let gameStarted = false;
+  let isGameOver = false;
+  let currentDifficulty = "easy";
+
+  const buttons = document.querySelectorAll(".btn");
+  const scoreDisplay = document.getElementById("score");
+  const patternSound = document.getElementById("patternSound");
+  const clickSound = document.getElementById("clickSound");
+  const difficultyButtons = document.querySelectorAll(".difficulty-btn");
+
+  buttons.forEach(button => {
+    button.addEventListener("click", () => {
+      if (!clickable || isGameOver) return;
+      const color = button.dataset.color;
+      userSequence.push(color);
+      flash(button);
+      clickSound.currentTime = 0;
+      clickSound.play();
+      checkInput();
+    });
+  });
+
+  function startGame(difficulty) {
+    if (gameStarted) return;
+
+    isGameOver = false;
+    gameStarted = true;
+    currentDifficulty = difficulty;
+    sequence = [];
+    userSequence = [];
+    coins = 0;
+    updateScore();
+    lockDifficultyButtons();
+
+    switch (difficulty) {
+      case "easy":
+        coinGain = 1;
+        break;
+      case "medium":
+        coinGain = 3;
+        break;
+      case "hard":
+        coinGain = 5;
+        break;
+    }
+
+    let initialRounds = difficulty === "easy" ? 1 : difficulty === "medium" ? 2 : 3;
+    for (let i = 0; i < initialRounds; i++) {
+      addToSequence();
+    }
+
+    playSequence();
+  }
+
+  function lockDifficultyButtons() {
+    difficultyButtons.forEach(btn => btn.disabled = true);
+  }
+
+  function unlockDifficultyButtons() {
+    difficultyButtons.forEach(btn => btn.disabled = false);
+  }
+
+  function addToSequence() {
+    const nextColor = colors[Math.floor(Math.random() * colors.length)];
+    sequence.push(nextColor);
+  }
+
+  function nextRound() {
+    clickable = false;
+    userSequence = [];
+
+    // Add more colors based on difficulty
+    if (currentDifficulty === "hard") {
+      addToSequence();
+      addToSequence();
+    } else {
+      addToSequence();
+    }
+
+    playSequence();
+  }
+
+  function playSequence() {
+    clickable = false;
+    let delay = 0;
+
+    sequence.forEach((color, index) => {
+      setTimeout(() => {
+        if (isGameOver) return;
+        const button = document.querySelector(`.btn.${color}`);
+        flash(button);
+        patternSound.currentTime = 0;
+        patternSound.play();
+      }, 700 * index);
+      delay = 700 * (index + 1);
+    });
+
+    setTimeout(() => {
+      if (!isGameOver) clickable = true;
+    }, delay);
+  }
+
+  function flash(button) {
+    button.classList.add("active");
+    setTimeout(() => {
+      button.classList.remove("active");
+    }, 400);
+  }
+
+  function checkInput() {
+    const currentIndex = userSequence.length - 1;
+    if (userSequence[currentIndex] !== sequence[currentIndex]) {
+      alert("❌ Wrong pattern! Game over.");
+      clickable = false;
+      gameStarted = false;
+      isGameOver = true;
+      unlockDifficultyButtons();
+      return;
+    }
+
+    if (userSequence.length === sequence.length) {
+      coins += coinGain;
+      updateScore();
+      setTimeout(() => {
+        if (!isGameOver) nextRound();
+      }, 1000);
+    }
+  }
+
+  function updateScore() {
+    scoreDisplay.textContent = `Coins: ${coins}`;
+  }
+</script>
+</body>
+</html>
