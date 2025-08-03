@@ -13,7 +13,35 @@
       color: #05386b;
       overflow-x: hidden;
     }
+ .dropdown {
+    position: relative;
+  }
 
+  /* Submenu styles */
+  .dropdown-content {
+    display: none;
+    position: relative;
+    background-color: #d0e7ff;
+    margin-left: 15px;
+    border-radius: 5px;
+  }
+
+  .dropdown-content a {
+    padding: 10px 18px;
+    margin-bottom: 0;
+    font-size: 0.7em;
+    color: #4a148c;
+  }
+
+  .dropdown-content a:hover {
+    background-color: #e1bee7;
+    color: #880e4f;
+  }
+
+  /* Show submenu on hover */
+  .dropdown:hover .dropdown-content {
+    display: block;
+  }
     .container {
       display: flex;
       justify-content: space-between;
@@ -127,12 +155,19 @@
   <button class="toggle-button" onclick="toggleMenu()">☰ Menu</button>
 
   <div class="sidebar" id="sidebar">
-    <a href="storyone.html" target="_blank">Layer One</a>
-    <a href="test.html" target="_blank">Animara</a>
-    <a href="storythree.html" target="_blank">Animara's Creation</a>
-    <a href="archive.html" target="_blank">Archive</a>
-    <a href="simonsays.html" target="_blank">Mini Game (For testing reasons) </a>
+  <a href="storyone.html" target="_blank">Layer One</a>
+  <a href="test.html" target="_blank">Animara</a>
+  <a href="storythree.html" target="_blank">Animara's Creation</a>
+  <a href="archive.html" target="_blank">Archive</a>
+
+  <div class="dropdown">
+    <a href="javascript:void(0)">Minigames ▼</a>
+    <div class="dropdown-content">
+      <a href="snake.html" target="_blank">Snake</a>
+      <a href="simonsays.html" target="_blank">Simon Says</a>
+    </div>
   </div>
+</div>
 
   <script>
     function toggleMenu() {
