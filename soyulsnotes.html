@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Soyul's Secret Notes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Indie+Flower&family=Schoolbell&display=swap" rel="stylesheet">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap" rel="stylesheet">
+  
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+    
+  font-family: "Schoolbell", cursive;
+  font-weight: 400;
+  font-style: normal;
+      background: #fff0f5;
+      padding: 40px;
+      color: #5e4b4b;
+      text-align: center;
+      position: relative;
+    }
+
+    h1 {
+      font-size: 36px;
+      margin-bottom: 20px;
+      color: #f78fb3;
+      text-shadow: 1px 1px #fff;
+      animation: bounceIn 0.6s ease;
+    }
+
+    .difficulty-buttons button {
+      margin: 5px;
+      padding: 12px 24px;
+      font-size: 16px;
+      cursor: pointer;
+      background: #ffe0f0;
+      border: 2px solid #ffc8dd;
+      color: #5e4b4b;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    .difficulty-buttons button:hover {
+      background: #fcd5e8;
+      transform: scale(1.05);
+    }
+
+    #cryptogram, #result, #key-panel {
+      display: none;
+    }
+
+    .letter-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: fadeInUp 0.4s ease forwards;
+      opacity: 0;
+      margin: 4px;
+    }
+
+    .letter-box:nth-child(n) {
+      animation-delay: calc(0.04s * var(--i));
+    }
+
+    .letter-box input {
+      width: 42px;
+      height: 42px;
+      text-align: center;
+      font-size: 20px;
+      border: 2px solid #d3c0d2;
+      border-radius: 10px;
+      background: #fff;
+      color: #5e4b4b;
+        font-family: "Indie Flower", cursive;
+  font-weight: 400;
+  font-style: normal;
+    }
+
+    .cipher {
+      font-size: 12px;
+      margin-top: 4px;
+      color: #b48bad;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 22px;
+      color: #88e0b0;
+      font-family: Verdana, sans-serif;
+    }
+
+    #key-panel {
+      margin-top: 40px;
+    }
+
+    #key-panel h2 {
+      color: #f78fb3;
+      margin-bottom: 10px;
+    }
+
+    .key-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .key-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 6px;
+    }
+
+    .key-box input {
+      width: 40px;
+      height: 40px;
+      font-size: 16px;
+      text-align: center;
+      border-radius: 8px;
+      text-transform: uppercase;
+      background: #fff;
+    }
+
+    .key-label {
+      font-size: 11px;
+      color: #a98da3;
+      margin-top: 3px;
+    }
+
+    #writingAnimation {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      width: 400px;
+      border-radius: 10px;
+      display: none;
+      pointer-events: none;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes bounceIn {
+      0% { transform: scale(0.9); opacity: 0; }
+      50% { transform: scale(1.05); opacity: 1; }
+      100% { transform: scale(1); }
+    }
+
+    /* Modal styles */
+    #introModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(255, 240, 250, 0.95);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    .modal-content {
+      max-width: 550px;
+      background: #fff;
+      border: 2px solid #fddde6;
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+      text-align: left;
+      font-size: 16px;
+      color: #5e4b4b;
+      position: relative;
+    }
+
+    .modal-content h2 {
+      text-align: center;
+      margin-bottom: 15px;
+      color: #f78fb3;
+    }
+
+    .modal-content button {
+      display: block;
+      margin: 20px auto 0;
+      padding: 10px 24px;
+      font-size: 15px;
+      background: #ffc8dd;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .modal-content button:hover {
+      background: #fcb3d4;
+    }
+#cryptogram {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-height: 60vh;
+  overflow-y: auto;
+  margin: 20px auto;
+  width: 95vw;
+  max-width: 800px;
+  padding: 20px;
+
+  background: #fefcf9; /* More paperlike tone */
+  border: 1px solid #d2c6aa; /* Slight outline like old paper */
+  border-radius: 6px;
+
+  box-shadow:
+    -5px 5px 10px rgba(0,0,0,0.1),
+    5px -5px 10px rgba(0,0,0,0.05),
+    inset 0 0 10px rgba(0,0,0,0.02); /* Adds slightly crumpled depth */
+
+  font-family: 'Courier New', Courier, monospace; /* Optional: old typewriter feel */
+
+  /* Optional scrap edge look */
+  clip-path: polygon(
+    0% 2%, 2% 0%, 98% 1%, 100% 3%,
+    99% 97%, 97% 100%, 3% 99%, 0% 97%
+  );
+
+  background-image: 
+    repeating-linear-gradient(0deg, transparent, transparent 19px, #ece5d8 20px); /* faux notebook lines */
+  background-size: 100% 20px;
+}
+
+
+
+  </style>
+</head>
+<body>
+
+  <!-- 🎀 Intro Modal -->
+  <div id="introModal">
+    <div class="modal-content">
+      <h2>💌 Soyul's Notes 💌</h2>
+      <p>
+        Haii!! I'm Sol, and sometimes I write secret letters because I'm, um, a little shy and quiet... (I'm mute ( ˶°ㅁ°) !!)<br><br>
+        Can you decode what I wrote? I like making it tricky! (¬_¬") Use the <strong>Letter Tester Key</strong> to figure it out — but don't overuse it... heehee! (˶˃ ᵕ ˂˶)<br><br>
+        P.S. Be gentle with my notes... they’re important to me. ( ◡̀_◡́)ᕤ
+      </p>
+      <button onclick="closeIntro()">ദ്ദി(˵ •̀ ᴗ - ˵ ) ✧</button>
+    </div>
+  </div>
+
+  <h1>📝 Soyul's Secret Notes</h1>
+
+  <div class="difficulty-buttons">
+    <button onclick="playWithAnimation('easy')">Easy ♡</button>
+    <button onclick="playWithAnimation('medium')">Medium ♡</button>
+    <button onclick="playWithAnimation('hard')">Hard ♡</button>
+    <button onclick="playWithAnimation('extreme')">Extreme ♡</button>
+  </div>
+
+  <video id="writingAnimation" src="soyulwriting.mov" autoplay></video>
+
+  <div id="cryptogram"></div>
+  <div id="result"></div>
+
+  <div id="key-panel">
+    <h2>🔍 Letter Tester Key</h2>
+    <div class="key-row" id="key-row"></div>
+  </div>
+
+<script>
+  // Modal logic
+  function closeIntro() {
+    document.getElementById("introModal").style.display = "none";
+  }
+
+  const sentences = {
+  easy: [
+    "STOP LOOKING AT THIS NOTE",
+    "VEX IS SCARY BUT CUTE DONT TELL HER I SAID THAT",
+    "YUNSU THINKS HES MY DAD LOL OKAY",
+    "KAIRO IS MY EMOTIONAL SUPPORT DAD",
+    "YUMIKO UNSTABLE BUT LIKE FUN",
+    "IM NOT DRAMATIC YOU JUST CANT HANDLE MY ENERGY",
+    "I TOLD YUNSU TO GO TOUCH GRASS HE DIDNT GET IT",
+    "KAIRO IS LITERALLY MY FAVORITE PERSON FIGHT ME",
+    "STOP READING",
+    "VEX BLINKED AND I FLINCHED ITS AN INSTINCT",
+    "I DONT HAVE ATTITUDE I HAVE STANDARDS",
+    "YUNSU KIDNAPPED ME AND EXPECTED GRATITUDE",
+    "IF VEX LOOKS AT YOU RUN TRUST ME",
+    "YUMIKO TALKS TO HER KNIVES HELP",
+    "I TOLD YUNSU HE WAS GIVING WEIRD UNCLE ENERGY",
+    "KAIRO IS DAD CODED I SAID WHAT I SAID",
+    "VEX HAS VILLAIN ENERGY AND NO REMORSE",
+    "YUMIKO IS CHAOS IN HUMAN FORM",
+    "I SURVIVED YUNSUS NONSENSE I DESERVE CAKE",
+    "VEX ONCE SMILED AND IT GAVE ME NIGHTMARES",
+    "I MAY BE SMALL BUT MY COMEBACKS HIT",
+    "YUNSU TALKS TOO MUCH I STOPPED LISTENING",
+    "KAIRO IS THE ONLY ADULT WITH BRAIN CELLS",
+    "VEX DOESNT THREATEN PEOPLE SHE JUST STARES",
+    "YUMIKO I LOVE HER BUT FROM A DISTANCE",
+    "I TOLD THE TRUTH AND NOW YUNSUS MAD BOOHOO",
+    "YUNSU KEEPS ACTING LIKE A PARENT THATS COMEDY GOLD",
+    "VEX SCARES ME BUT IN A COOL OLDER SISTER WAY",
+    "YUMIKO SAYS SHES FINE THATS CODE FOR DUCK",
+    "KAIRO DESERVES A RAISE HE DOESNT EVEN GET PAID",
+    "YUNSU GROUNDED ME ONCE I LAUGHED IN HIS FACE",
+    "VEX COULD BLINK AND START A WAR ICONIC BEHAVIOR"
+  ],
+  medium: [
+    "I TOLD YOU NOT TO OPEN THIS",
+    "I AM DEFINITELY NOT HIDING ANYTHING",
+    "YOU CANT PROVE ANYTHING OKAY",
+    "YUMIKO STABBED A WALL BECAUSE IT LOOKED AT HER WEIRD",
+    "I ONCE TOLD VEX SHE NEEDED THERAPY THAT WAS A BOLD MOVE",
+    "YUNSU SAYS I LOVE YOU I SAY HE NEEDS THERAPY",
+    "YUMIKO LOVES CHAOS AND IM HER UNPAID INTERN",
+    "I DESERVE PEACE SNACKS AND A NAP",
+    "VEX DOESNT NEED TO YELL HER GLARE DOES IT FOR HER",
+    "YUNSU TRIED TO LECTURE ME AND I FELL ASLEEP",
+    "VEX ONCE PATTED MY HEAD I DIDNT SLEEP FOR DAYS",
+    "I TOLD YUNSU HES THE VILLAIN IN MY MEMOIR",
+    "YUMIKO IS A WALKING HAZARD WITH GOOD EYELINER",
+    "VEX IS THE REASON DONT MESS WITH HER EXISTS",
+    "YUNSU NEEDS A TIMEOUT FOR LIKE FOREVER",
+    "YUMIKO IS PRETTY AND TERRIFYING I ASPIRE",
+    "YUNSU THINKS KIDNAPPING BUILDS BONDS BOLD ASSUMPTION",
+    "YUMIKO SAID TRUST ME SO I RAN",
+    "VEX DOESNT RAISE HER VOICE SHE LOWERS YOURS",
+    "YUNSU KEEPS ACTING LIKE A PARENT THATS COMEDY GOLD",
+    "VEX SCARES ME BUT IN A COOL OLDER SISTER WAY",
+    "YUMIKO SAYS SHES FINE THATS CODE FOR DUCK",
+    "KAIRO DESERVES A RAISE HE DOESNT EVEN GET PAID",
+    "YUNSU GROUNDED ME ONCE I LAUGHED IN HIS FACE",
+    "VEX COULD BLINK AND START A WAR ICONIC BEHAVIOR",
+    "YUMIKO STABBED A WALL BECAUSE IT LOOKED AT HER WEIRD",
+    "I ONCE TOLD VEX SHE NEEDED THERAPY BOLD MOVE",
+    "YUNSU SAYS I LOVE YOU I SAY THERAPY",
+    "YUMIKO LOVES CHAOS IM HER UNPAID INTERN",
+    "I DESERVE PEACE SNACKS AND A NAP",
+    "VEX DOESNT NEED TO FIGHT HER GLARE DOES IT",
+    "YUNSU TRIED TO LECTURE ME I FELL ASLEEP",
+    "VEX ONCE PATTED MY HEAD I DIDNT SLEEP FOR DAYS",
+    "I TOLD YUNSU HES THE VILLAIN IN MY MEMOIR"
+  ],
+  hard: [
+    "I MAY HAVE BORROWED YOUR JOURNAL FOR RESEARCH PURPOSES",
+    "THIS NOTE WILL SELF DESTRUCT IN LIKE FORTY YEARS",
+    "I TOLD YUNSU HE COULDNT PARENT A GOLDFISH LET ALONE ME",
+    "VEX DOESNT YELL HER SILENCE IS LOUDER THAN BOMBS",
+    "YUMIKO ONCE MADE EYE CONTACT WITH A DEMON AND WON",
+    "KAIRO HAS DAD ENERGY WITHOUT THE EMOTIONAL UNAVAILABILITY",
+    "YUNSU TRIED TO GROUND ME I GROUNDED HIM EMOTIONALLY",
+    "VEX WALKS LIKE SHE OWNS THE WORLD HONESTLY MAYBE SHE DOES",
+    "YUMIKO ONCE SAID OOPS THAT WAS THE SCARIEST PART",
+    "KAIRO HAS NO IDEA HOW MUCH I APPERCIATE HIM NONE",
+    "I TOLD YUNSU HES ONE PLOT TWIST FROM IRRELEVANCE",
+    "VEX TOLD ME TO BE QUIET AND I EVAPORATED",
+    "YUMIKOS IDEA OF THERAPY IS THROWING KNIVES ROMANTIC",
+    "VEX SMILED AT ME I THOUGHT THE WORLD WAS ENDING",
+    "YUMIKO BLINKED AND THE LIGHTS WENT OUT",
+    "I TOLD YUNSU HE FLUNKED FATHERHOOD",
+    "VEX ONCE MADE A ROOM GO SILENT JUST BY WALKING IN",
+    "YUMIKOS OOPS HAS A DEATH COUNT",
+    "YUNSUS WHOLE VIBE SCREAMS MIDLIFE CRISIS BUT EVIL",
+    "YUMIKO ONCE COOKED THE KITCHEN HAS NEVER RECOVERED",
+    "I TOLD YUNSU TO GET A PERSONALITY HE GOT OFFENDED",
+    "VEX ONCE SAID PLEASE THATS WHEN I KNEW I MESSED UP",
+    "YUMIKO HAS A KNIFE FOR EVERY EMOTION GIRL MATH",
+    "YUNSU DESERVES A VILLAIN ORIGIN STORY DOCUMENTARY",
+    "I TOLD YUNSU HE COULDNT PARENT A GOLDFISH LET ALONE ME",
+    "VEX DOESNT YELL HER SILENCE IS LOUDER THAN BOMBS",
+    "YUMIKO ONCE MADE EYE CONTACT WITH A DEMON AND WON",
+    "KAIRO HAS DAD ENERGY WITHOUT THE EMOTIONAL UNAVAILABILITY",
+    "YUNSU TRIED TO GROUND ME I GROUNDED HIM EMOTIONALLY",
+    "VEX WALKS LIKE SHE OWNS THE WORLD HONESTLY MAYBE SHE DOES",
+    "YUMIKO ONCE SAID OOPS THAT WAS THE SCARIEST PART",
+    "KAIRO HAS NO IDEA HOW MUCH I APPERCIATE HIM NONE"
+  ],
+  extreme: [
+    "IM NOT SAYING I TOOK IT BUT LETS JUST SAY IT ISNT YOURS ANYMORE",
+    "IF THIS MESSAGE MAKES NO SENSE ITS BECAUSE YOU CANT HANDLE MY GENIUS",
+    "VEX SMILED POLITELY AND FIVE PEOPLE DEVELOPED TRAUMA INCLUDING ME",
+    "YUNSU ONCE SAID I CARE I CHECKED THE SKY FOR PIGS",
+    "YUMIKO HUGGED ME ONCE I THOUGHT I HALLUCINATED",
+    "KAIRO IS LITERALLY THE DAD I MANIFESTED WITH TRAUMA",
+    "I TOLD YUNSU HE NEEDED A LOBOTOMY HE CALLED IT RUDE",
+    "VEX DOESNT ARGUE SHE WINS IN SILENCE",
+    "YUMIKO ONCE ADOPTED A PET SCORPION IT RAN AWAY",
+    "I GAVE YUNSU A COMPLIMENT HE LOOKED SUSPICIOUS",
+    "VEX ONCE GAVE ME ADVICE I CRIED FOR SIX HOURS",
+    "KAIRO OFFERED ME SOUP AND I FORGAVE MY ENEMIES",
+    "I TOLD YUNSU TO STOP TRAUMA BONDING HE SAID OUCH",
+    "VEX IS ALLERGIC TO WEAKNESS AND PROBABLY HAPPINESS",
+    "YUMIKOS COOKING TASTES LIKE REVENGE I LIKED IT",
+    "VEX DOESNT KNOCK SHE APPEARS",
+    "I WROTE YUNSU IS THE PROBLEM IN MY DIARY BOLD",
+    "VEX BLINKED AND THE WEATHER CHANGED COINCIDENCE NO",
+    "YUMIKO WHISPERED OOPS BEFORE THE EXPLOSION",
+    "I TOLD YUNSU ID CALL CPS HE LAUGHED NERVOUSLY",
+    "VEX SAID GOOD JOB AND I THOUGHT I WAS HALLUCINATING",
+    "YUNSU TAUGHT ME HOW NOT TO RAISE A CHILD",
+    "I TOLD YUNSU IM THRIVING ITS A REVENGE ARC",
+    "VEX SMILED POLITELY AND FIVE PEOPLE DEVELOPED TRAUMA INCLUDING ME",
+    "YUNSU ONCE SAID I CARE I CHECKED THE SKY FOR PIGS",
+    "YUMIKO HUGGED ME ONCE I THOUGHT I HALLUCINATED",
+    "KAIRO IS LITERALLY THE DAD I MANIFESTED WITH TRAUMA",
+    "I TOLD YUNSU HE NEEDED A LOBOTOMY HE CALLED IT RUDE",
+    "VEX DOESNT ARGUE SHE WINS IN SILENCE",
+    "YUMIKO ONCE ADOPTED A PET SCORPION IT RAN AWAY",
+    "I GAVE YUNSU A COMPLIMENT HE LOOKED SUSPICIOUS",
+    "VEX ONCE GAVE ME ADVICE I CRIED FOR SIX HOURS",
+    "KAIRO OFFERED ME SOUP AND I FORGAVE MY ENEMIES"
+  ]
+};
+
+  let original = "";
+  let encrypted = "";
+  let mapping = {};
+  let revealed = {};
+
+  const video = document.getElementById("writingAnimation");
+
+  function playWithAnimation(difficulty) {
+    document.getElementById("cryptogram").style.display = "none";
+    document.getElementById("result").style.display = "none";
+    document.getElementById("key-panel").style.display = "none";
+
+    video.style.display = "block";
+    video.currentTime = 0;
+    video.play();
+
+    video.onended = () => {
+      video.style.display = "none";
+      document.getElementById("cryptogram").style.display = "flex";
+      document.getElementById("result").style.display = "block";
+      document.getElementById("key-panel").style.display = "block";
+      startGame(difficulty);
+    };
+  }
+
+  function getRandomSentence(difficulty) {
+    const options = sentences[difficulty];
+    return options[Math.floor(Math.random() * options.length)];
+  }
+
+  function shuffleAlphabet() {
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('');
+    for (let i = alphabet.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [alphabet[i], alphabet[j]] = [alphabet[j], alphabet[i]];
+    }
+    return alphabet;
+  }
+
+  function startGame(difficulty) {
+    original = getRandomSentence(difficulty).toUpperCase();
+    mapping = {};
+    revealed = {};
+
+    const shuffled = shuffleAlphabet();
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('');
+    let idx = 0;
+
+    for (let char of alphabet) {
+      mapping[char] = shuffled[idx++];
+    }
+
+    encrypted = original.split("").map(c => {
+      return /[A-Z]/.test(c) ? mapping[c] : c;
+    }).join("");
+
+    let revealCount;
+    switch (difficulty) {
+      case "easy": revealCount = 5; break;
+      case "medium": revealCount = 3; break;
+      case "hard": revealCount = 2; break;
+      case "extreme": revealCount = 0; break;
+      default: revealCount = 0;
+    }
+
+    const uniqueLetters = [...new Set(original.replace(/[^A-Z]/g, ''))];
+    const toReveal = uniqueLetters.sort(() => 0.5 - Math.random()).slice(0, revealCount);
+    toReveal.forEach(letter => {
+      revealed[mapping[letter]] = letter;
+    });
+
+    renderCryptogram();
+    renderKeyTester();
+  }
+
+  function renderCryptogram() {
+    const container = document.getElementById("cryptogram");
+    container.innerHTML = "";
+
+    for (let i = 0; i < encrypted.length; i++) {
+      const cipherChar = encrypted[i];
+      const box = document.createElement("div");
+      box.className = "letter-box";
+      box.style.setProperty('--i', i);
+
+      if (!/[A-Z]/.test(cipherChar)) {
+        box.innerHTML = `<div style="width: 40px; height: 40px; font-size: 24px;">${cipherChar}</div>`;
+      } else {
+        const input = document.createElement("input");
+        input.maxLength = 1;
+        input.dataset.index = i;
+        input.style.textTransform = "uppercase";  // Make letters display uppercase
+
+        if (revealed[cipherChar]) {
+          input.value = revealed[cipherChar];
+          input.disabled = true;
+        }
+
+        // Force uppercase on input and check win condition
+        input.addEventListener("input", (e) => {
+          e.target.value = e.target.value.toUpperCase();
+          checkWin();
+        });
+
+        const cipherLabel = document.createElement("div");
+        cipherLabel.className = "cipher";
+        cipherLabel.textContent = cipherChar;
+
+        box.appendChild(input);
+        box.appendChild(cipherLabel);
+      }
+
+      container.appendChild(box);
+    }
+  }
+
+  function checkWin() {
+    const inputs = document.querySelectorAll("#cryptogram input");
+    let guess = "";
+
+    inputs.forEach((input) => {
+      guess += input.value.toUpperCase() || " ";
+    });
+
+    const cleanedGuess = guess.replace(/\s+/g, '');
+    const cleanedOriginal = original.replace(/\s+/g, '');
+
+    document.getElementById("result").textContent =
+      cleanedGuess === cleanedOriginal ? "You solved my note!! 𐔌՞. .՞𐦯" : "";
+  }
+
+  function renderKeyTester() {
+    const row = document.getElementById("key-row");
+    row.innerHTML = "";
+
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('');
+
+    alphabet.forEach(cipherLetter => {
+      const box = document.createElement("div");
+      box.className = "key-box";
+
+      const input = document.createElement("input");
+      input.maxLength = 1;
+      input.style.textTransform = "uppercase"; // Force uppercase display on input
+
+      // Force uppercase and check win on input
+      input.addEventListener("input", (e) => {
+        e.target.value = e.target.value.toUpperCase();
+        checkWin();
+      });
+
+      const label = document.createElement("div");
+      label.className = "key-label";
+      label.textContent = cipherLetter;
+
+      // Color input box based on correctness of guess
+      input.addEventListener("input", () => {
+        const guess = input.value.toUpperCase();
+        // Find original letter that maps to this cipherLetter
+        const correct = Object.keys(mapping).find(k => mapping[k] === cipherLetter);
+        if (guess === correct) {
+          input.style.backgroundColor = "#aaffaa";
+          input.style.color = "#000";
+        } else {
+          input.style.backgroundColor = "#ffaaaa";
+          input.style.color = "#000";
+        }
+      });
+
+      box.appendChild(input);
+      box.appendChild(label);
+      row.appendChild(box);
+    });
+  }
+</script>
+
+</body>
+</html>
