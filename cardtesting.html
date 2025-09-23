@@ -295,7 +295,7 @@
     <li><strong>Deviora</strong> – Hybrid Support/DPS, Strength: 10, can heal teammates</li>
     <li><strong>Kairo</strong> – DPS, Strength: 9</li>
     <li><strong>Anaka</strong> – DPS, Strength: 12</li>
-    <li><strong>The Twins</strong> – DPS, 10/70 chance to one-shot an opponent</li>
+    <li><strong>The Twins</strong> – DPS, 20/70 chance to one-shot an opponent</li>
   </ul>
 </div>
 
@@ -812,7 +812,7 @@ function performAttack(state, sideFrom, fromIdx, sideTo, toIdx){
     const attackerCardElem = getCardElement(sideFrom, fromIdx);
     playLungeAnimation(attackerCardElem, ()=> {
       const eff = createEffect(getCardElement(sideTo, toIdx), 'gamble');
-      if(chance < 0.10){
+      if(chance < 0.20){
         // one-shot kill
         target.HP = 0;
         updateHPBar(getCardElement(sideTo,toIdx), 0);
