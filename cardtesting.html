@@ -1,0 +1,1113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<title>Animara: Pixel Card Battles</title>
+<style>
+  /* ---------- Pixel theme basics ---------- */
+  :root{
+    --bg:#0b0b11;
+    --panel:#111218;
+    --accent:#8ff7c1;
+    --muted:#9aa0a6;
+    --red:#ff6b6b;
+    --green:#4caf50;
+    --gold:#ffd166;
+  }
+  html,body{height:100%;margin:0;background:linear-gradient(180deg,#06060a, #0b0b11);font-family: "Press Start 2P", "Courier New", monospace; -webkit-font-smoothing: none;}
+  /* Use a pixel-like look; if the user doesn't have Press Start 2P, fallback to monospace */
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+  .container{max-width:1100px;margin:20px auto;padding:20px;color:var(--accent);position:relative;}
+  h1{font-size:20px;margin:6px 0;color:var(--gold);text-align:center}
+  p{color:var(--muted);line-height:1.3}
+
+  /* ---------- Modal / Splash ---------- */
+  .splash{
+    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.65);z-index:20;
+  }
+  .splash-card{
+    width:760px;max-width:95%;background:linear-gradient(180deg,#101217,#0b0b11);border:6px solid #000;padding:22px;border-radius:6px;box-shadow: 0 10px 30px rgba(0,0,0,.7);
+    image-rendering: pixelated;
+  }
+  .splash h2{color:var(--accent);margin:0 0 6px 0;font-size:16px}
+  .splash p{color:#dfe7e3;font-size:11px}
+  .btn{display:inline-block;background:var(--accent);color:#001; padding:10px 14px;border-radius:6px;margin-top:10px;cursor:pointer;border:none;font-weight:700;text-transform:uppercase;letter-spacing:0.5px}
+  .small{font-size:12px;padding:6px 10px}
+
+  /* ---------- Team selection ---------- */
+  .panel{background:linear-gradient(180deg,#0f1620,#0b0f15);border:3px solid #000;padding:18px;border-radius:8px;margin:12px 0}
+  .row{display:flex;gap:12px;align-items:center;justify-content:center}
+  /* ---------- Team selection cards (bigger) ---------- */
+/* ---------- Bigger Team Selection Cards ---------- */
+.cards {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 12px;
+  perspective: 1000px; /* needed for 3D flip */
+}
+
+.card {
+  width: 150px;
+  height: 220px;
+  position: relative;
+  cursor: pointer;
+}
+
+.card-inner {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+}
+
+.card.flipped .card-inner {
+  transform: rotateY(180deg);
+}
+
+.card-front, .card-back {
+  width: 100%;
+  height: 100%;
+  background: #0b0c10;
+  border: 3px solid #000;
+  border-radius: 8px;
+  padding: 8px;
+  box-shadow: 0 8px 18px rgba(0,0,0,.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  backface-visibility: hidden;
+  image-rendering: pixelated;
+}
+
+.card-front img {
+  width: 108px;
+  height: 108px;
+  object-fit: contain;
+}
+
+.card-front .name {
+  font-size: 12px;
+  color: var(--gold);
+  text-align: center;
+  margin-top: 6px;
+}
+
+.card-back {
+  transform: rotateY(180deg);
+  font-size: 11px;
+  color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+/* Stats container */
+.stats {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+/* Individual stat row */
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+}
+
+.stat-label {
+  font-size: 10px;
+  color: var(--gold);
+}
+
+.stat-bar {
+  flex: 1;
+  height: 8px;
+  margin-left: 4px;
+  background: #333;
+  border: 1px solid #000;
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-bar-fill {
+  height: 100%;
+  background: #ffcc00; /* gold bar */
+  width: 50%; /* will adjust in JS */
+}
+
+
+.card .rerollBtn, .card .picked {
+  font-size: 12px;
+  padding: 6px 8px;
+  margin-top: 6px;
+}
+
+.rerollBtn{position:absolute;left:8px;bottom:8px;background:#28323b;border:2px solid #000;color:var(--accent);padding:6px;border-radius:6px;cursor:pointer;font-size:11px}
+  .card .picked{position:absolute;right:8px;bottom:8px;background:#082c3b;color:var(--accent);padding:6px;border-radius:6px;font-size:11px}
+
+  .controls{display:flex;gap:8px;justify-content:center;margin-top:12px;align-items:center}
+  select, input[type=number]{background:#081018;color:var(--accent);border:2px solid #000;padding:8px;border-radius:6px;font-family:inherit}
+
+  /* ---------- Battle screen ---------- */
+  .arena{height:520px;background:linear-gradient(180deg,#07101a, #021016);border-radius:10px;border:3px solid #000;margin-top:18px;position:relative;overflow:hidden;padding:12px}
+  .lane{position:absolute;width:100%;display:flex;justify-content:center;gap:24px;padding:8px;left:0}
+  .lane.top{top:36px}
+  .lane.bottom{bottom:36px}
+  .battle-card{width:140px;height:180px;background:#071018;border:3px solid #000;border-radius:8px;display:flex;flex-direction:column;align-items:center;padding:8px;position:relative;transition:transform .25s}
+  .battle-card img{width:92px;height:92px;object-fit:contain;image-rendering:pixelated}
+  .hpbar{position:absolute;left:6px;right:6px;top:6px;height:12px;background:#0b0f13;border:2px solid #000;border-radius:3px;overflow:hidden}
+  .hpfill{height:100%;width:100%;background:var(--green);transition:width .5s linear}
+  .dead{filter:grayscale(1) blur(0.6px);opacity:.4}
+  .stunned{filter:grayscale(1) opacity:.6}
+
+  /* effect overlays */
+  .effect{
+    position:absolute;pointer-events:none;width:140px;height:180px;border-radius:6px;left:0;top:0;display:flex;align-items:center;justify-content:center;font-weight:700;color:#001
+  }
+  .effect.heal{background:rgba(100,255,150,0.12);animation:healPop .6s}
+  .effect.buff{background:rgba(150,180,255,0.12);animation:buffPop .6s}
+  .effect.stun{background:rgba(255,100,100,0.12);animation:stunShake .6s}
+  .effect.gamble{background:rgba(255,235,120,0.12);animation:flash .6s}
+  @keyframes healPop{0%{transform:scale(.9);opacity:0}50%{transform:scale(1.08);opacity:1}100%{transform:scale(1);opacity:0}}
+  @keyframes buffPop{0%{transform:scale(.9);opacity:0}50%{transform:scale(1.08);opacity:1}100%{transform:scale(1);opacity:0}}
+  @keyframes stunShake{0%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}100%{transform:translateX(0)}}
+  @keyframes flash{0%{opacity:0}25%{opacity:1}75%{opacity:1}100%{opacity:0}}
+
+  /* tiny HUD */
+  .hud{display:flex;justify-content:space-between;align-items:center;margin-top:8px;color:var(--muted);font-size:12px}
+  .wins{background:#081018;padding:6px 10px;border-radius:6px;border:2px solid #000;color:var(--gold)}
+
+  /* victory */
+  .result{
+    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.8);padding:18px;border-radius:8px;border:3px solid #000;color:var(--gold);
+    display:none;z-index:30;text-align:center
+  }
+  .pixel-btn{background:#ffd166;color:#001;padding:10px 14px;border-radius:6px;border:none;cursor:pointer;font-weight:700}
+
+  /* small helper */
+  .muted{color:var(--muted);font-size:12px}
+  .center{display:flex;align-items:center;justify-content:center}
+  
+   .guide-toggle {
+    font-family: 'Press Start 2P', monospace;
+    background: #333;
+    color: #fff;
+    padding: 10px 15px;
+    border: 3px solid #fff;
+    cursor: pointer;
+    margin-bottom: 10px;
+  }
+
+  .guide-box {
+    display: none;
+    background: #111;
+    color: #eee;
+    padding: 15px;
+    border: 3px solid #fff;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .guide-box h2 {
+    margin-top: 0;
+    font-size: 14px;
+    color: #ffcc00;
+  }
+
+  .guide-box ul {
+    padding-left: 20px;
+  }
+
+  .guide-box li {
+    margin-bottom: 6px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Animara</h1>
+
+  <!-- Splash Screen -->
+  <div id="splash" class="splash">
+    <div class="splash-card">
+      <h2>Welcome to Animara</h2>
+      <p>
+        Build a team of 3 characters and battle a randomized opponent team (3 vs 3). Each card has derived stats (HP, Attack, Defense, Speed).
+        <br><br>
+        Mechanics:
+        <ul>
+          <li>Each of your 3 cards can be rerolled once during team selection.</li>
+          <li>If you have a saved <strong>Win</strong>, you may spend it to pick any character from the dropdown instead of rerolling.</li>
+          <li>During battle, click an enemy card to attack. Support cards let you click allies to target buffs/heals/etc.</li>
+        </ul>
+      </p>
+      <div class="center" style="gap:12px">
+        <button class="btn" id="startGameBtn">Start Game</button>
+        <button class="btn small" id="skipSplash">Skip (shows only first time)</button>
+      </div>
+    </div>
+  </div>
+  
+ <button class="guide-toggle" onclick="toggleGuide()">📖 View Character Guide</button>
+
+<!-- 📋 Collapsible Guide -->
+<div id="guideBox" class="guide-box">
+  <h2>Character Guide</h2>
+  <p><strong>DPS:</strong> Deals direct damage based on Strength.</p>
+  <p><strong>Support:</strong> Uses unique abilities (heal, buff, stun, etc.).</p>
+  <hr>
+
+  <ul>
+    <li><strong>Yunsu</strong> – DPS, Strength: 12</li>
+    <li><strong>Luna</strong> – DPS, Strength: 7</li>
+    <li><strong>Melanie</strong> – DPS, Strength: 5 (Strength becomes 12 if Vivian is on the same team)</li>
+    <li><strong>Aiko</strong> – DPS, Strength: 7</li>
+    <li><strong>Damian</strong> – DPS, Strength: 5</li>
+    <li><strong>Yumiko</strong> – DPS, Strength: 10</li>
+    <li><strong>Hyun</strong> – DPS, Strength: 12</li>
+    <li><strong>Vivian</strong> – DPS, Strength: 12</li>
+    <li><strong>Stella</strong> – DPS, Strength: 3</li>
+    <li><strong>Nikki</strong> – DPS, Strength: 5</li>
+    <li><strong>Jamie</strong> – Support, lets a teammate act again</li>
+    <li><strong>Vex</strong> – DPS, Strength: 15</li>
+    <li><strong>Arma</strong> – DPS, Strength: 11</li>
+    <li><strong>Soyul</strong> – Support, buffs a teammate’s Strength by +4</li>
+    <li><strong>Minjung</strong> – DPS, Strength: 12</li>
+    <li><strong>Myrrin</strong> – Support, heals a teammate</li>
+    <li><strong>Celestino De Luca</strong> – Support, stuns an enemy for 3 turns</li>
+    <li><strong>Deviora</strong> – Hybrid Support/DPS, Strength: 10, can heal teammates</li>
+    <li><strong>Kairo</strong> – DPS, Strength: 9</li>
+    <li><strong>Anaka</strong> – DPS, Strength: 12</li>
+    <li><strong>The Twins</strong> – DPS, 10/70 chance to one-shot an opponent</li>
+  </ul>
+</div>
+
+  <!-- Team Selection -->
+  <div id="teamSelect" class="panel">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div class="muted">Choose your team — reroll each card <strong>once</strong>.</div>
+      <div class="hud">
+        <div class="wins">Wins: <span id="winsCount">0</span></div>
+      </div>
+    </div>
+
+    <div class="cards" id="selectionCards">
+      <!-- Cards injected here -->
+    </div>
+
+    <div class="controls">
+      <label class="muted">Spend a win to pick a character: </label>
+      <select id="pickDropdown">
+        <option value="">-- Select character (cost: 1 win) --</option>
+      </select>
+      <button class="btn small" id="spendWinBtn">Spend Win & Apply to Selected Slot</button>
+      <button class="btn" id="toBattleBtn">Start Battle</button>
+    </div>
+  </div>
+
+  <!-- Arena -->
+  <div id="arenaPanel" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div class="muted">Battle Arena</div>
+      <div class="hud">
+        <div class="wins">Wins: <span id="winsCount2">0</span></div>
+        <div style="width:12px"></div>
+        <button class="btn small" id="backToSelect">Back</button>
+      </div>
+    </div>
+
+    <div class="arena" id="arena">
+      <div class="lane top" id="opponentLane"></div>
+      <div class="lane bottom" id="playerLane"></div>
+
+      <div id="turnBanner" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:var(--gold);display:none;font-weight:700"></div>
+    </div>
+  </div>
+
+  <div class="result" id="resultBox">
+    <div id="resultText" style="font-size:16px"></div>
+    <div style="margin-top:12px"><button class="pixel-btn" id="okResult">Continue</button></div>
+  </div>
+</div>
+
+<script>
+  function toggleGuide() {
+    const guide = document.getElementById("guideBox");
+    guide.style.display = (guide.style.display === "block") ? "none" : "block";
+  }
+/* -------------------------
+   Data & Derived stats
+   ------------------------- */
+const baseCharacters = [
+  {name:"Yunsu", type:"DPS", strength:12, img:"yunsu3.png", special:null},
+  {name:"Luna", type:"DPS", strength:7, img:"lunap2.png", special:null},
+  {name:"Melanie", type:"DPS", strength:5, img:"melanie.png", special:"melanieBoost"},
+  {name:"Aiko", type:"DPS", strength:7, img:"aikop2.png", special:null},
+  {name:"Damian", type:"DPS", strength:5, img:"damianp2.png", special:null},
+  {name:"Yumiko", type:"DPS", strength:10, img:"yumikop2.PNG", special:null},
+  {name:"Hyun", type:"DPS", strength:12, img:"hyun.png", special:null},
+  {name:"Vivian", type:"DPS", strength:12, img:"vivianp2.png", special:null},
+  {name:"Stella", type:"DPS", strength:3, img:"stellap2.png", special:null},
+  {name:"Nikki", type:"DPS", strength:5, img:"nikki.PNG", special:null},
+  {name:"Jamie", type:"Support", strength:0, img:"jamie.png", special:"extraTurn"},
+  {name:"Vex", type:"DPS", strength:15, img:"vex3.png", special:null},
+  {name:"Arma", type:"DPS", strength:11, img:"arma.png", special:null},
+  {name:"Soyul", type:"Support", strength:0, img:"soyul3.PNG", special:"boost"},
+  {name:"Minjung", type:"DPS", strength:12, img:"minjung.png", special:null},
+  {name:"Myrrin", type:"Support", strength:0, img:"myrrin3.png", special:"heal"},
+  {name:"Celestino De Luca", type:"Support", strength:0, img:"celestino.png", special:"stun"},
+  {name:"Deviora", type:"SupportDPS", strength:10, img:"deviora.png", special:"heal"},
+  {name:"Kario", type:"DPS", strength:9, img:"kairo3.PNG", special:null},
+  {name:"Anaka", type:"DPS", strength:12, img:"anaka3.PNG", special:null},
+  {name:"Twins", type:"DPS", strength:0, img:"twins.png", special:"gamble"}
+];
+
+// stat derivation: you asked for "real game" stats built from strength
+function deriveStats(ch){
+  // Melanie special handled later
+  const strength = ch.strength || 0;
+  const hp = 80 + strength * 8;          // base HP
+  const atk = 4 + Math.round(strength * 1.8); // attack scales with strength
+  const def = Math.max(0, Math.round(strength / 3)); // defense lowers damage
+  const spd = 8 + Math.round(strength / 2);   // speed used for minor AI choices
+  return {hp,atk,def,spd};
+}
+
+const CHAR_POOL = baseCharacters.map(c=>{
+  const s = deriveStats(c);
+  return Object.assign({}, c, {maxHP:s.hp,HP:s.hp,ATK:s.atk,DEF:s.def,SPD:s.spd, stunned:0, buffs:[]});
+});
+
+/* -------------------------
+   localStorage persistent wins
+   ------------------------- */
+function getWins(){ return parseInt(localStorage.getItem('animara_wins')||'0') }
+function setWins(n){ localStorage.setItem('animara_wins', String(n)); updateWinsUI(); }
+function addWin(){ setWins(getWins()+1) }
+function spendWin(){ const w=getWins(); if(w>0){ setWins(w-1); return true } return false }
+
+function updateWinsUI(){
+  document.getElementById('winsCount').innerText = getWins();
+  document.getElementById('winsCount2').innerText = getWins();
+}
+
+/* -------------------------
+   UI State for team selection
+   ------------------------- */
+let currentTeam = []; // objects deep copied from CHAR_POOL
+let selectionRerolled = [false,false,false]; // per-slot if rerolled
+let opponentTeam = [];
+let activeBattleState = null; // will hold runtime battle state
+
+/* ---------- Helper functions ---------- */
+function deepCopyChar(c){
+  return JSON.parse(JSON.stringify(c));
+}
+function pickRandomExcluding(excludeNames, count=3){
+  const pool = CHAR_POOL.filter(x => !excludeNames.includes(x.name));
+  const out = [];
+  while(out.length < count && pool.length > 0){
+    const i = Math.floor(Math.random()*pool.length);
+    const pick = pool.splice(i,1)[0];
+    out.push(deepCopyChar(pick));
+  }
+  return out;
+}
+
+/* ---------- Initialize selection UI ---------- */
+const selectionCardsDiv = document.getElementById('selectionCards');
+
+function populatePickDropdown(){
+  const d = document.getElementById('pickDropdown');
+  d.innerHTML = '<option value="">-- Select character (cost: 1 win) --</option>';
+  CHAR_POOL.forEach(c => {
+    const o = document.createElement('option');
+    o.value = c.name; o.innerText = c.name;
+    d.appendChild(o);
+  });
+}
+
+function initialRandomTeam(){
+  currentTeam = pickRandomExcluding([],3);
+  // apply Melanie-Vivian synergy if present
+  applySynergies(currentTeam);
+  selectionRerolled = [false,false,false];
+  renderSelectionCards();
+}
+
+function renderSelectionCards(){
+  selectionCardsDiv.innerHTML = '';
+  currentTeam.forEach((ch, idx)=>{
+    const card = document.createElement('div');
+    card.className = 'card';
+
+    const inner = document.createElement('div');
+    inner.className = 'card-inner';
+
+    // calculate stat percentages for bars
+    const hpPercent = Math.min(100, (ch.maxHP / 20) * 100);  // assuming 20 is max HP scale
+    const atkPercent = Math.min(100, (ch.ATK / 20) * 100);
+    const defPercent = Math.min(100, (ch.DEF / 20) * 100);
+    const spdPercent = Math.min(100, (ch.SPD / 20) * 100);
+
+    inner.innerHTML = `
+      <div class="card-front">
+        <img src="${ch.img}" alt="${ch.name}">
+        <div class="name">${ch.name}</div>
+      </div>
+      <div class="card-back">
+        <div class="stats">
+          <div class="stat-row"><span class="stat-label">HP</span>
+            <div class="stat-bar"><div class="stat-bar-fill" style="width:${hpPercent}%"></div></div>
+          </div>
+          <div class="stat-row"><span class="stat-label">ATK</span>
+            <div class="stat-bar"><div class="stat-bar-fill" style="width:${atkPercent}%"></div></div>
+          </div>
+          <div class="stat-row"><span class="stat-label">DEF</span>
+            <div class="stat-bar"><div class="stat-bar-fill" style="width:${defPercent}%"></div></div>
+          </div>
+          <div class="stat-row"><span class="stat-label">SPD</span>
+            <div class="stat-bar"><div class="stat-bar-fill" style="width:${spdPercent}%"></div></div>
+          </div>
+        </div>
+        <button class="rerollBtn">${selectionRerolled[idx] ? 'Rerolled' : 'Reroll'}</button>
+        ${ch.pickedByWin ? '<div class="picked">Picked</div>' : ''}
+      </div>
+    `;
+    card.appendChild(inner);
+
+    card.onclick = (e) => { if(!e.target.classList.contains('rerollBtn')) card.classList.toggle('flipped'); }
+
+    const rr = inner.querySelector('.rerollBtn');
+    rr.disabled = selectionRerolled[idx];
+    rr.onclick = (e) => {
+      e.stopPropagation();
+      if(selectionRerolled[idx]) return;
+      rerollSlot(idx);
+      renderSelectionCards();
+    }
+
+    selectionCardsDiv.appendChild(card);
+  });
+}
+
+
+
+/* reroll logic: replace slot idx with a new random char that is not already in team */
+function rerollSlot(idx){
+  if(selectionRerolled[idx]) return;
+  // pick from pool excluding current team names
+  const exclude = currentTeam.map(c=>c.name);
+  const replacement = pickRandomExcluding(exclude,1)[0];
+  currentTeam[idx] = replacement;
+  selectionRerolled[idx] = true;
+  applySynergies(currentTeam);
+  renderSelectionCards();
+}
+
+/* Spend win and override a slot: user chooses slot via prompt-like UI; we'll ask slot index */
+document.getElementById('spendWinBtn').addEventListener('click',()=>{
+  if(getWins() <= 0){ alert('No wins to spend'); return; }
+  const pick = document.getElementById('pickDropdown').value;
+  if(!pick){ alert('Choose a character to spend win on'); return; }
+  // choose which slot to assign: prompt style
+  let slot = prompt('Which slot to replace? Enter 1, 2, or 3 (left-to-right)');
+  if(!slot) return;
+  slot = parseInt(slot);
+  if(!(slot>=1 && slot<=3)){ alert('Invalid slot'); return; }
+  // ensure the chosen char is not in other selected slots (we'll remove current slot and allow pick)
+  const others = currentTeam.map(c=>c.name); others[slot-1] = null;
+  if(others.includes(pick)){ alert('You already have that character in another slot'); return; }
+  // spend win
+  if(!spendWin()) { alert('No wins left'); return; }
+  // apply pick
+  const chosen = CHAR_POOL.find(c=>c.name === pick);
+  if(!chosen){ alert('Character not found'); return; }
+  const copy = deepCopyChar(chosen);
+  copy.pickedByWin = true;
+  currentTeam[slot-1] = copy;
+  selectionRerolled[slot-1] = true; // considered "locked"
+  applySynergies(currentTeam);
+  renderSelectionCards();
+});
+
+/* apply synergies e.g., Melanie <-> Vivian */
+function applySynergies(team){
+  const names = team.map(t=>t.name);
+  team.forEach(t => {
+    // reset base derived stats
+    const base = CHAR_POOL.find(c=>c.name===t.name);
+    if(base){
+      t.maxHP = base.maxHP; t.HP = base.HP; t.ATK = base.ATK; t.DEF = base.DEF; t.SPD = base.SPD;
+    }
+  });
+  // Melanie becomes strength 12 if Vivian present => increase ATK/HP accordingly
+  const mel = team.find(t=>t.name === 'Melanie');
+  const viv = team.find(t=>t.name === 'Vivian');
+  if(mel && viv){
+    // bump stats to emulate strength 12 (approx)
+    mel.ATK = Math.round(4 + Math.round(12 * 1.8));
+    mel.maxHP = 80 + 12 * 8;
+    mel.HP = Math.min(mel.HP, mel.maxHP);
+  }
+}
+
+/* ---------- Start / Splash handling ---------- */
+document.getElementById('startGameBtn').addEventListener('click', ()=> {
+  document.getElementById('splash').style.display='none';
+  initSelection();
+});
+document.getElementById('skipSplash').addEventListener('click', ()=> {
+  // hide and mark a flag so it won't show (for brevity, we hide)
+  document.getElementById('splash').style.display='none';
+  initSelection();
+});
+
+/* ---------- Selection flow ---------- */
+function initSelection(){
+  updateWinsUI();
+  populatePickDropdown();
+  initialRandomTeam();
+  document.getElementById('teamSelect').style.display = 'block';
+  document.getElementById('arenaPanel').style.display = 'none';
+}
+
+/* Start Battle button */
+document.getElementById('toBattleBtn').addEventListener('click',()=>{
+  // lock team (validate at least one non-null)
+  if(currentTeam.length !== 3){ alert('Team invalid'); return; }
+  // create opponent team that excludes user's characters
+  const exclude = currentTeam.map(c=>c.name);
+  opponentTeam = pickRandomExcluding(exclude,3);
+  applySynergies(opponentTeam);
+  startBattle(currentTeam, opponentTeam);
+});
+
+/* ---------- Battle System ---------- */
+const arena = document.getElementById('arena');
+const opponentLane = document.getElementById('opponentLane');
+const playerLane = document.getElementById('playerLane');
+const resultBox = document.getElementById('resultBox');
+const resultText = document.getElementById('resultText');
+document.getElementById('okResult').addEventListener('click', ()=> {
+  resultBox.style.display='none';
+  // return to selection
+  document.getElementById('arenaPanel').style.display='none';
+  document.getElementById('teamSelect').style.display='block';
+  updateWinsUI();
+  // randomize new team on return
+  initialRandomTeam();
+});
+
+document.getElementById('backToSelect').addEventListener('click', ()=>{
+  if(confirm('Exit battle? Your battle will be lost.')) {
+    document.getElementById('arenaPanel').style.display='none';
+    document.getElementById('teamSelect').style.display='block';
+  }
+});
+
+function startBattle(userTeamBase, opTeamBase){
+  document.getElementById('teamSelect').style.display='none';
+  document.getElementById('arenaPanel').style.display='block';
+  document.getElementById('opponentLane').innerHTML = '';
+  document.getElementById('playerLane').innerHTML = '';
+  // deep copy and reset HP/states
+  const userTeamBattle = userTeamBase.map(c => {
+    const cp = deepCopyChar(CHAR_POOL.find(x=>x.name===c.name) || c);
+    // if c had tweaks from pickByWin etc:
+    if(c.pickedByWin) cp.pickedByWin = true;
+    return cp;
+  });
+  const opTeamBattle = opTeamBase.map(c => deepCopyChar(CHAR_POOL.find(x=>x.name===c.name) || c));
+  applySynergies(userTeamBattle);
+  applySynergies(opTeamBattle);
+
+  // runtime state
+  const state = {
+    player: userTeamBattle.map(p => Object.assign({...p}, {HP:p.maxHP, stunned:0, buffs:[], tempATK:0})),
+    enemy: opTeamBattle.map(p => Object.assign({...p}, {HP:p.maxHP, stunned:0, buffs:[], tempATK:0})),
+    turnSide: 'player', // 'player' or 'enemy'
+    turnIndex: 0, // index within side for current turn
+    awaitingPlayerTarget: false,
+    playerActionSlot: null, // which player card is acting
+    locks: {}
+  };
+  activeBattleState = state;
+  renderBattleState(state);
+  updateWinsUI();
+  // start turns
+  setTimeout(()=> runTurn(state), 350); // small delay for dramatic effect
+}
+
+function renderBattleState(state){
+  opponentLane.innerHTML = '';
+  playerLane.innerHTML = '';
+  // create enemy cards
+  state.enemy.forEach((c, i)=>{
+    const card = document.createElement('div'); card.className='battle-card'; card.dataset.side='enemy'; card.dataset.index=i;
+    card.innerHTML = `
+      <div class="hpbar"><div class="hpfill" style="width:${Math.max(0,Math.round(c.HP/c.maxHP*100))}%"></div></div>
+      <img src="${c.img}" alt="${c.name}">
+      <div style="height:6px"></div>
+      <div style="font-size:11px;color:var(--gold)">${c.name}</div>
+      <div style="font-size:10px;color:var(--muted)">${c.ATK} ATK • ${c.DEF} DEF</div>
+    `;
+    if(c.HP<=0) card.classList.add('dead');
+    if(c.stunned > 0) card.classList.add('stunned');
+    opponentLane.appendChild(card);
+  });
+
+  state.player.forEach((c, i)=>{
+    const card = document.createElement('div'); card.className='battle-card'; card.dataset.side='player'; card.dataset.index=i;
+    card.innerHTML = `
+      <div class="hpbar"><div class="hpfill" style="width:${Math.max(0,Math.round(c.HP/c.maxHP*100))}%"></div></div>
+      <img src="${c.img}" alt="${c.name}">
+      <div style="height:6px"></div>
+      <div style="font-size:11px;color:var(--gold)">${c.name}</div>
+      <div style="font-size:10px;color:var(--muted)">${c.ATK} ATK • ${c.DEF} DEF</div>
+    `;
+    if(c.HP<=0) card.classList.add('dead');
+    if(c.stunned > 0) card.classList.add('stunned');
+    playerLane.appendChild(card);
+  });
+}
+
+/* ---------- Turn runner ---------- */
+function runTurn(state){
+  // check win/loss
+  if(checkBattleEnd(state)) return;
+  // find next alive actor for the side
+  const sideArray = state.turnSide === 'player' ? state.player : state.enemy;
+  // find next index with alive
+  let i = state.turnIndex;
+  let attempts = 0;
+  while(attempts < sideArray.length && (sideArray[i].HP <= 0 || sideArray[i].stunned > 0)){
+    i = (i+1) % sideArray.length; attempts++;
+  }
+  // If all are dead or stunned, skip to other side
+  if(sideArray[i].HP <= 0 || sideArray[i].stunned > 0){
+    // switch side
+    state.turnSide = state.turnSide === 'player' ? 'enemy' : 'player';
+    state.turnIndex = 0;
+    setTimeout(()=> runTurn(state), 120);
+    return;
+  }
+  // set acting index
+  state.playerActionSlot = state.turnSide === 'player' ? i : null;
+  state.enemyActionSlot = state.turnSide === 'enemy' ? i : null;
+  // show a brief banner
+  showTurnBanner(state.turnSide, i);
+  // player side: wait for click target; enemy side: AI handles
+  if(state.turnSide === 'player'){
+    enablePlayerInteraction(state, i);
+  } else {
+    // enemy AI action after delay
+    setTimeout(()=> enemyAction(state, i), 600 + Math.random()*400);
+  }
+}
+
+/* helper: show turn banner momentarily */
+function showTurnBanner(side, idx){
+  const b = document.getElementById('turnBanner');
+  b.style.display='block';
+  b.innerText = side === 'player' ? `Your Turn — Card ${idx+1}` : `Enemy Turn`;
+  setTimeout(()=> b.style.display='none', 700);
+}
+
+/* enable player to click targets (enemy to attack, allies for support targets) */
+function enablePlayerInteraction(state, idx){
+  // highlight clickable enemy cards and ally cards if support
+  const playerCard = playerLane.querySelector(`.battle-card[data-index='${idx}']`);
+  if(!playerCard) { endPlayerTurnAndProceed(state); return; }
+  // which actor
+  const actor = state.player[idx];
+  // if actor is dead or stunned, skip
+  if(actor.HP <= 0 || actor.stunned > 0){ endPlayerTurnAndProceed(state); return; }
+
+  // mark attackable enemy cards
+  const enemyCards = [...opponentLane.querySelectorAll('.battle-card')];
+  enemyCards.forEach(ec => {
+    const ei = parseInt(ec.dataset.index);
+    const en = state.enemy[ei];
+    if(en.HP > 0){
+      ec.style.cursor = 'pointer';
+      ec.onclick = ()=> {
+        // if actor is DPS or support used as attack, perform attack
+        if(actor.type.startsWith('DPS') || actor.type === 'DPS'){
+          performAttack(state, 'player', idx, 'enemy', ei);
+        } else if(actor.type === 'Support' || actor.type === 'SupportDPS'){
+          // some supports can also attack; for simplicity: support default is to apply support to ally OR attack enemy on right-click
+          // We'll assume clicking enemy for support-type will attack if it has attack (Deviora)
+          if(actor.special === 'heal' && actor.ATK <= 2){
+            // heal by clicking an ally instead; ignore click on enemy
+            // flash invalid
+            actorInvalidClick(ec);
+          } else {
+            performAttack(state, 'player', idx, 'enemy', ei);
+          }
+        } else {
+          performAttack(state, 'player', idx, 'enemy', ei);
+        }
+      }
+    } else {
+      ec.style.cursor = 'not-allowed';
+      ec.onclick = null;
+    }
+  });
+
+  // if actor is Support with support-target behavior, allow clicking allies
+  if(actor.type === 'Support' || actor.special === 'heal' || actor.special === 'boost' || actor.special === 'extraTurn' || actor.special === 'stun' && actor.type === 'Support'){
+    const allyCards = [...playerLane.querySelectorAll('.battle-card')];
+    allyCards.forEach(ac => {
+      const ai = parseInt(ac.dataset.index);
+      const al = state.player[ai];
+      if(al.HP > 0){
+        ac.style.cursor = 'pointer';
+        ac.onclick = ()=> {
+          performSupport(state, 'player', idx, ai);
+        }
+      } else {
+        ac.style.cursor = 'not-allowed';
+      }
+    });
+  }
+}
+
+/* small visual for invalid click */
+function actorInvalidClick(elem){
+  elem.style.transform = 'translateY(-6px)';
+  setTimeout(()=> elem.style.transform = '', 220);
+}
+
+/* performAttack: animate attacker lunging, compute damage with ATK-DEF */
+function performAttack(state, sideFrom, fromIdx, sideTo, toIdx){
+  // clear all clickable handlers
+  clearClickable();
+  const fromArr = sideFrom === 'player'? state.player : state.enemy;
+  const toArr = sideTo === 'player'? state.player : state.enemy;
+  const attacker = fromArr[fromIdx]; const target = toArr[toIdx];
+  if(attacker.HP <= 0 || target.HP <= 0) { endTurnAfterAction(state); return; }
+
+  // handle special cases: Twins gamble one-shot
+  if(attacker.special === 'gamble'){
+    // 30% one-shot
+    const chance = Math.random();
+    const attackerCardElem = getCardElement(sideFrom, fromIdx);
+    playLungeAnimation(attackerCardElem, ()=> {
+      const eff = createEffect(getCardElement(sideTo, toIdx), 'gamble');
+      if(chance < 0.10){
+        // one-shot kill
+        target.HP = 0;
+        updateHPBar(getCardElement(sideTo,toIdx), 0);
+        animateHit(getCardElement(sideTo,toIdx));
+      } else {
+        // normal weak hit
+        const dmg = Math.max(1, Math.round((attacker.ATK) - (target.DEF * 0.6)));
+        target.HP = Math.max(0, target.HP - dmg);
+        updateHPBar(getCardElement(sideTo,toIdx), target.HP);
+        animateHit(getCardElement(sideTo,toIdx));
+      }
+      setTimeout(()=> { removeEffect(eff); endTurnAfterAction(state); }, 600);
+    });
+    return;
+  }
+
+  // normal damage calc
+  const baseDamage = Math.max(1, Math.round(attacker.ATK - Math.round(target.DEF * 0.6)));
+  // critical or variability
+  const variability = Math.floor(Math.random()*5) - 2; // -2..+2
+  const damage = Math.max(1, baseDamage + variability);
+
+  // lunge attack animation then apply damage
+  const elemFrom = getCardElement(sideFrom, fromIdx);
+  const elemTo = getCardElement(sideTo, toIdx);
+  playLungeAnimation(elemFrom, ()=> {
+    const eff = createEffect(elemTo, ''); // show a quick flash
+    target.HP = Math.max(0, target.HP - damage);
+    updateHPBar(elemTo, target.HP);
+    animateHit(elemTo);
+    setTimeout(()=> { removeEffect(eff); endTurnAfterAction(state); }, 520);
+  });
+}
+
+/* performSupport: handle special support abilities */
+function performSupport(state, side, fromIdx, allyIdx){
+  clearClickable();
+  const actor = state.player[fromIdx];
+  const ally = state.player[allyIdx];
+  if(actor.HP <= 0 || ally.HP <= 0){ endTurnAfterAction(state); return; }
+
+  const elemFrom = getCardElement('player', fromIdx);
+  const elemAlly = getCardElement('player', allyIdx);
+
+  if(actor.special === 'heal'){
+    // Myrrin/Deviora: heal selected ally
+    const healAmt = 30 + Math.round(actor.ATK * 1.5);
+    playSupportGlow(elemFrom, elemAlly, 'heal', ()=> {
+      ally.HP = Math.min(ally.maxHP, ally.HP + healAmt);
+      updateHPBar(elemAlly, ally.HP);
+      endTurnAfterAction(state);
+    });
+  } else if(actor.special === 'boost'){
+    // Soyul: +4 attack for 3 turns
+    const buffVal = 4;
+    ally.ATK += buffVal;
+    ally.buffs.push({type:'ATK', amount:buffVal, turns:3});
+    playSupportGlow(elemFrom, elemAlly, 'buff', ()=> {
+      flashBuff(elemAlly);
+      endTurnAfterAction(state);
+    });
+  } else if(actor.special === 'extraTurn'){
+    // Jamie: give selected ally immediate extra action (we give them next turn)
+    // Implementation: set a flag on ally so after end-turn we set state.turnSide/player index appropriately
+    ally.extraTurn = true;
+    playSupportGlow(elemFrom, elemAlly, 'buff', ()=> {
+      // visual cue
+      flashBuff(elemAlly);
+      endTurnAfterAction(state, ()=> {
+        // extra turn will be consumed in endTurnAfterAction flow
+      });
+    });
+  } else if(actor.special === 'stun'){
+    // Celestino: stun an enemy for 3 turns -- but this is a support, so for users we'd want ally-target? we will allow it only if clicked enemy
+    // But since performSupport is called by clicking allies, ignore for now
+    endTurnAfterAction(state);
+  } else {
+    // fallback: do nothing
+    endTurnAfterAction(state);
+  }
+}
+
+/* enemyAction: simple AI */
+function enemyAction(state, idx){
+  const actor = state.enemy[idx];
+  if(actor.HP <= 0){ endTurnAfterAction(state); return; }
+  // if stunned
+  if(actor.stunned > 0){ endTurnAfterAction(state); return; }
+
+  // choose action by special type or attack
+  if(actor.special === 'heal'){
+    // try to heal low ally
+    const low = state.enemy.reduce((a,b,ii) => {
+      if(b.HP > 0 && (a==null || b.HP/a.HP < a.HP/a.maxHP)) return b;
+      return a;
+    }, null);
+    // simpler: if any ally below 60% heal, do heal
+    const targetIndex = state.enemy.findIndex(e => e.HP < e.maxHP*0.6 && e.HP>0);
+    if(targetIndex !== -1 && Math.random() < 0.7){
+      // heal targetIndex
+      const elemFrom = getCardElement('enemy', idx);
+      const elemAlly = getCardElement('enemy', targetIndex);
+      const healAmt = 25 + Math.round(actor.ATK * 1.2);
+      playSupportGlow(elemFrom, elemAlly, 'heal', ()=> {
+        state.enemy[targetIndex].HP = Math.min(state.enemy[targetIndex].maxHP, state.enemy[targetIndex].HP + healAmt);
+        updateHPBar(elemAlly, state.enemy[targetIndex].HP);
+        endTurnAfterAction(state);
+      });
+      return;
+    }
+  } else if(actor.special === 'stun'){
+    // stun a random player card
+    const targetIndices = state.player.map((p,i)=>p.HP>0?i:-1).filter(x=>x>=0);
+    if(targetIndices.length>0){
+      const tid = targetIndices[Math.floor(Math.random()*targetIndices.length)];
+      const elemFrom = getCardElement('enemy', idx);
+      const elemTarget = getCardElement('player', tid);
+      playSupportGlow(elemFrom, elemTarget, 'stun', ()=> {
+        state.player[tid].stunned = 3; // 3 turns
+        // visual
+        elemTarget.classList.add('stunned');
+        endTurnAfterAction(state);
+      });
+      return;
+    }
+  } else if(actor.special === 'gamble'){
+    // prefer attack
+  }
+
+  // default: attack random player alive
+  const targets = state.player.map((p,i)=>p.HP>0?i:-1).filter(x=>x>=0);
+  if(targets.length === 0){ endTurnAfterAction(state); return; }
+  const tid = targets[Math.floor(Math.random()*targets.length)];
+  performAttack(state, 'enemy', idx, 'player', tid);
+}
+
+/* utility: play lunge animation */
+function playLungeAnimation(elemFrom, done){
+  if(!elemFrom) { if(done) done(); return; }
+  elemFrom.style.transition = 'transform .18s';
+  elemFrom.style.transform = 'translateY(-12px) translateX(0) scale(1.05)';
+  setTimeout(()=> {
+    elemFrom.style.transform = '';
+    setTimeout(()=> {
+      if(done) done();
+    }, 160);
+  }, 180);
+}
+
+/* support glow */
+function playSupportGlow(fromElem, toElem, type, done){
+  const eff = createEffect(toElem, type === 'heal' ? 'heal' : type === 'buff' ? 'buff' : type === 'stun' ? 'stun' : '');
+  // small source pulse for visual
+  fromElem.style.transform='translateY(-6px)';
+  setTimeout(()=> fromElem.style.transform='', 350);
+  setTimeout(()=> { removeEffect(eff); if(done) done(); }, 600);
+}
+
+/* createEffect: overlay */
+function createEffect(targetElem, cls){
+  const eff = document.createElement('div');
+  eff.className = 'effect ' + (cls || '');
+  eff.innerHTML = cls==='gamble' ? '<span style="color:#001">!</span>' : '';
+  targetElem.appendChild(eff);
+  return eff;
+}
+function removeEffect(e){ if(e && e.parentNode) e.parentNode.removeChild(e); }
+
+/* small hit animation */
+function animateHit(elem){
+  elem.style.transform='translateY(4px) scale(.98)';
+  setTimeout(()=> elem.style.transform='', 180);
+  elem.style.boxShadow='0 6px 12px rgba(255,80,80,0.12)';
+  setTimeout(()=> elem.style.boxShadow='', 200);
+}
+
+/* buff flash */
+function flashBuff(elem){
+  const e = createEffect(elem, 'buff');
+  setTimeout(()=> removeEffect(e), 600);
+}
+
+/* updateHPBar visual */
+function updateHPBar(cardElem, hpVal){
+  const fill = cardElem.querySelector('.hpfill');
+  const idx = parseInt(cardElem.dataset.index);
+  // determine maxHP by looking at side
+  const side = cardElem.dataset.side;
+  const arr = side === 'player' ? activeBattleState.player : activeBattleState.enemy;
+  const max = arr[idx].maxHP;
+  const pct = Math.max(0, Math.round(hpVal / max * 100));
+  fill.style.width = pct + '%';
+  if(pct <= 0) cardElem.classList.add('dead');
+}
+
+/* clear clickable handlers */
+function clearClickable(){
+  const all = document.querySelectorAll('.battle-card');
+  all.forEach(c => { c.onclick = null; c.style.cursor='default' });
+}
+
+/* get card element by side/index */
+function getCardElement(side, idx){
+  const lane = side === 'player' ? playerLane : opponentLane;
+  return lane.querySelector(`.battle-card[data-index='${idx}']`);
+}
+
+/* after action done - advance turn, decrement buffs/stuns, handle extra-turns */
+function endTurnAfterAction(state, callback){
+  // apply end-of-action housekeeping:
+  // decrement current actor's stun if needed? stun count decremented at the start of their next cycle
+  // decrement all buffs' turns
+  const decBuffs = (arr) => arr.forEach(ch => {
+    if(ch.buffs && ch.buffs.length){
+      ch.buffs.forEach(b => b.turns = b.turns - 1);
+      const remain = ch.buffs.filter(b=>b.turns>0);
+      // if any buff expired remove and revert stat
+      const expired = ch.buffs.filter(b=>b.turns<=0);
+      expired.forEach(e => {
+        if(e.type==='ATK') ch.ATK = Math.max(1, ch.ATK - e.amount);
+      });
+      ch.buffs = remain;
+    }
+    // decrement stunned if present (stun durataion ticks after their turn)
+    if(ch.stunned && ch.stunned > 0){
+      ch.stunned = Math.max(0, ch.stunned - 1);
+    }
+  });
+  decBuffs(state.player); decBuffs(state.enemy);
+
+  // handle extraTurn flags: if acting player had extraTurn for someone, set next turn accordingly
+  // find if any player has extraTurn
+  const etIndex = state.player.findIndex(p => p.extraTurn);
+  if(etIndex >= 0){
+    // consume
+    state.player[etIndex].extraTurn = false;
+    state.turnSide = 'player';
+    state.turnIndex = etIndex;
+    renderBattleState(state);
+    setTimeout(()=> runTurn(state), 220);
+    if(callback) callback();
+    return;
+  }
+
+  // advance turn and index
+  if(state.turnSide === 'player'){
+    // advance index within player, then switch to enemy
+    state.turnIndex = (state.turnIndex + 1) % state.player.length;
+    state.turnSide = 'enemy';
+    // ensure enemy has alive actors; if none, then player wins
+  } else {
+    state.turnIndex = (state.turnIndex + 1) % state.enemy.length;
+    state.turnSide = 'player';
+  }
+
+  renderBattleState(state);
+  setTimeout(()=> runTurn(state), 240);
+  if(callback) callback();
+}
+
+/* check end of battle */
+function checkBattleEnd(state){
+  const playerAlive = state.player.some(p => p.HP > 0);
+  const enemyAlive = state.enemy.some(e => e.HP > 0);
+  if(!playerAlive || !enemyAlive){
+    const youWin = playerAlive && !enemyAlive;
+    showResult(youWin ? 'Victory!' : 'Defeat', youWin);
+    return true;
+  }
+  return false;
+}
+
+function showResult(text, won){
+  resultText.innerText = text;
+  resultBox.style.display = 'block';
+  if(won){ addWin(); } // reward win
+  updateWinsUI();
+}
+
+/* ---------- initial boot ---------- */
+updateWinsUI();
+populatePickDropdown();
+initialRandomTeam();
+
+/* Make splash only show once per session unless closed manually (simple logic) */
+window.addEventListener('load', ()=>{
+  // if user previously opened, show splash only first time per localStorage flag
+  const seen = localStorage.getItem('animara_splash_shown');
+  if(!seen){
+    document.getElementById('splash').style.display = 'flex';
+    localStorage.setItem('animara_splash_shown','1');
+  } else {
+    document.getElementById('splash').style.display = 'none';
+  }
+});
+</script>
+</body>
+</html>
