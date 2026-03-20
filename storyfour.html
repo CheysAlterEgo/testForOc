@@ -195,128 +195,143 @@
   <div id="collectionStatus"></div>
   <audio id="flipSound" src="click.mp3"></audio>
 
-  <script>
-    const items = [
-      { name: 'Horse', rarity: '4', image: 'horse.PNG' },
-      { name: 'Chico', rarity: '5', image: 'chico.jpg' },
-      { name: 'Yumiko', rarity: '5', image: 'yumiko4.jpg' },
-      { name: 'Minsu', rarity: '5', image: 'minsu.jpg' },
-      { name: 'Naiomi', rarity: '5', image: 'nainai.PNG' },
-      { name: 'Faris', rarity: '5', image: 'faris.jpg' },
-     { name: 'Marina', rarity: '5', image: 'marina.jpg' },
-      { name: 'Trixie', rarity: '5', image: 'trixie.jpg' },
-      { name: 'Yunsu', rarity: 'secret', image: 'cook.jpg' },
-      {name: 'VEX', rarity: 'secret', image: 'vexpart4.jpg' }
-    ];
+ <script>
+  const items = [
+    // 4-stars (hidden from sidebar display)
+    { name: 'Rice', rarity: '4', image: 'fourstar1.JPG' },
+    { name: 'Science', rarity: '4', image: 'fourstar2.JPG' },
+    { name: 'Ahhh', rarity: '4', image: 'fourstar3.JPG' },
+     { name: 'Vex is watching', rarity: '4', image: 'fourstar4.JPG' },
+     { name: 'Pewpew', rarity: '4', image: 'fourstar5.JPG' },
 
-    let coinCount = 10;
-    const collection = {};
-    items.forEach(item => collection[item.name] = 0);
+    // 5-stars
+    { name: 'Chico', rarity: '5', image: 'chico.jpg' },
+    { name: 'Yumiko', rarity: '5', image: 'yumiko4.jpg' },
+    { name: 'Minsu', rarity: '5', image: 'minsu.jpg' },
+    { name: 'Naiomi', rarity: '5', image: 'nainai.PNG' },
+    { name: 'Faris', rarity: '5', image: 'faris.jpg' },
+    { name: 'Marina', rarity: '5', image: 'marina.jpg' },
+    { name: 'Trixie', rarity: '5', image: 'trixie.jpg' },
 
-    function updateCoinDisplay() {
-      document.getElementById('coinDisplay').textContent = 'Coins: ' + coinCount;
-      const buttons = document.querySelectorAll('.earnMoreBtn');
-      buttons.forEach(btn => {
-        const cost = parseInt(btn.textContent);
-        btn.disabled = coinCount < cost;
-      });
-    }
+    // secrets
+    { name: 'Yunsu', rarity: 'secret', image: 'cook.jpg' },
+    { name: 'VEX', rarity: 'secret', image: 'vexpart4.jpg' }
+  ];
 
-    function updateCollectionDisplay() {
-      const container = document.getElementById('collectionStatus');
-      let collectedCount = 0;
-      let content = '<strong>Collection Progress:</strong><ul style="list-style:none;">';
+  let coinCount = 10;
+  const collection = {};
+  items.forEach(item => collection[item.name] = 0);
 
-      items.forEach(item => {
-        const count = collection[item.name];
-        const owned = count > 0;
-        if (owned) collectedCount++;
-        content += `<li class="${owned ? '' : 'uncollected'}">${item.name}${count > 1 ? ' (' + count + ')' : ''}</li>`;
-      });
+  function updateCoinDisplay() {
+    document.getElementById('coinDisplay').textContent = 'Coins: ' + coinCount;
+    const buttons = document.querySelectorAll('.earnMoreBtn');
+    buttons.forEach(btn => {
+      const cost = parseInt(btn.textContent);
+      btn.disabled = coinCount < cost;
+    });
+  }
 
-      content += '</ul>';
-      const progressPercent = (collectedCount / items.length) * 100;
-      content += `<div class="progress-bar"><div class="progress-bar-fill" style="width:${progressPercent}%"></div></div>`;
-      container.innerHTML = content;
-    }
+  function updateCollectionDisplay() {
+    const container = document.getElementById('collectionStatus');
+    let collectedCount = 0;
+    let visibleItems = items.filter(item => item.rarity !== '4'); // 👈 hide 4-stars
 
-   function getRandomItem() {
-  const roll = Math.random();
-  const fourStars = items.filter(i => i.rarity === '4');
-  const fiveStars = items.filter(i => i.rarity === '5');
-  const secrets = items.filter(i => i.rarity === 'secret');
+    let content = '<strong>Collection Progress:</strong><ul style="list-style:none;">';
 
-  if (roll < 0.75) return fourStars[Math.floor(Math.random() * fourStars.length)];
-  if (roll < 0.95) return fiveStars[Math.floor(Math.random() * fiveStars.length)];
-  return secrets[Math.floor(Math.random() * secrets.length)];
-}
-
-
-    function doPull(count) {
-      if (coinCount < count) {
-        document.getElementById('notEnough').style.display = 'block';
-        setTimeout(() => document.getElementById('notEnough').style.display = 'none', 2000);
-        return;
-      }
-
-      coinCount -= count;
-      updateCoinDisplay();
-
-      const container = document.getElementById('resultContainer');
-      const loader = document.getElementById('loading');
-      container.innerHTML = '';
-      loader.style.display = 'block';
-
-      setTimeout(() => {
-        loader.style.display = 'none';
-        for (let i = 0; i < count; i++) {
-          const item = getRandomItem();
-          const card = document.createElement('div');
-          card.className = 'card';
-          const inner = document.createElement('div');
-          inner.className = 'card-inner';
-          const front = document.createElement('div');
-          front.className = 'card-front ' + (item.rarity === '4' ? 'blue' : item.rarity === '5' ? 'yellow' : 'purple');
-          const back = document.createElement('div');
-          back.className = 'card-back';
-          const img = document.createElement('img');
-          img.src = item.image;
-          img.alt = item.name;
-          img.title = item.name;
-          back.appendChild(img);
-          inner.appendChild(front);
-          inner.appendChild(back);
-          card.appendChild(inner);
-
-          card.addEventListener('click', () => {
-            if (card.classList.contains('flipped')) return;
-            card.classList.add('flipped');
-            card.classList.add(`glow-${item.rarity === '4' ? 'blue' : item.rarity === '5' ? 'yellow' : 'purple'}`);
-            card.classList.add('animate-glow');
-            document.getElementById('flipSound').play();
-            collection[item.name]++;
-            updateCollectionDisplay();
-          });
-
-          container.appendChild(card);
-        }
-      }, 1500);
-    }
-
-    // Message from snake game iframe
-    window.addEventListener('message', event => {
-      if (event.data && event.data.type === 'snakeScore') {
-        const score = event.data.score;
-        document.getElementById('snakeScore').textContent = 'Snake Score: ' + score;
-        coinCount += score;
-        updateCoinDisplay();
-      }
+    visibleItems.forEach(item => {
+      const count = collection[item.name];
+      const owned = count > 0;
+      if (owned) collectedCount++;
+      content += `<li class="${owned ? '' : 'uncollected'}">${item.name}${count > 1 ? ' (' + count + ')' : ''}</li>`;
     });
 
-    // Initial setup
-    updateCollectionDisplay();
+    content += '</ul>';
+    const progressPercent = (collectedCount / visibleItems.length) * 100;
+    content += `<div class="progress-bar"><div class="progress-bar-fill" style="width:${progressPercent}%"></div></div>`;
+    container.innerHTML = content;
+  }
+
+  function getRandomItem() {
+    const roll = Math.random();
+    const fourStars = items.filter(i => i.rarity === '4');
+    const fiveStars = items.filter(i => i.rarity === '5');
+    const secrets = items.filter(i => i.rarity === 'secret');
+
+    if (roll < 0.75) return fourStars[Math.floor(Math.random() * fourStars.length)];
+    if (roll < 0.95) return fiveStars[Math.floor(Math.random() * fiveStars.length)];
+    return secrets[Math.floor(Math.random() * secrets.length)];
+  }
+
+  function doPull(count) {
+    if (coinCount < count) {
+      document.getElementById('notEnough').style.display = 'block';
+      setTimeout(() => document.getElementById('notEnough').style.display = 'none', 2000);
+      return;
+    }
+
+    coinCount -= count;
     updateCoinDisplay();
-  </script>
+
+    const container = document.getElementById('resultContainer');
+    const loader = document.getElementById('loading');
+    container.innerHTML = '';
+    loader.style.display = 'block';
+
+    setTimeout(() => {
+      loader.style.display = 'none';
+      for (let i = 0; i < count; i++) {
+        const item = getRandomItem();
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        const inner = document.createElement('div');
+        inner.className = 'card-inner';
+
+        const front = document.createElement('div');
+        front.className = 'card-front ' + (item.rarity === '4' ? 'blue' : item.rarity === '5' ? 'yellow' : 'purple');
+
+        const back = document.createElement('div');
+        back.className = 'card-back';
+
+        const img = document.createElement('img');
+        img.src = item.image;
+        img.alt = item.name;
+        img.title = item.name;
+
+        back.appendChild(img);
+        inner.appendChild(front);
+        inner.appendChild(back);
+        card.appendChild(inner);
+
+        card.addEventListener('click', () => {
+          if (card.classList.contains('flipped')) return;
+          card.classList.add('flipped');
+          card.classList.add(`glow-${item.rarity === '4' ? 'blue' : item.rarity === '5' ? 'yellow' : 'purple'}`);
+          card.classList.add('animate-glow');
+          document.getElementById('flipSound').play();
+          collection[item.name]++;
+          updateCollectionDisplay();
+        });
+
+        container.appendChild(card);
+      }
+    }, 1500);
+  }
+
+  // Message from snake game iframe
+  window.addEventListener('message', event => {
+    if (event.data && event.data.type === 'snakeScore') {
+      const score = event.data.score;
+      document.getElementById('snakeScore').textContent = 'Snake Score: ' + score;
+      coinCount += score;
+      updateCoinDisplay();
+    }
+  });
+
+  // Initial setup
+  updateCollectionDisplay();
+  updateCoinDisplay();
+</script>
 
 </body>
 </html>
