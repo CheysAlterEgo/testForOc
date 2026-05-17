@@ -107,16 +107,18 @@
       box-shadow: 0 0 20px 5px rgba(168, 95, 240, 0.8);
     }
     #collectionStatus {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      background: white;
-      border: 1px solid #ccc;
-      padding: 10px;
-      border-radius: 5px;
-      width: 220px;
-      font-family: "Ribeye", serif;
-    }
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  background: white;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+  width: 220px;
+  max-height: 60vh;   /* limits how tall it can grow */
+  overflow-y: auto;   /* enables vertical scrolling */
+  font-family: "Ribeye", serif;
+}
     .uncollected {
       color: #aaa;
     }
