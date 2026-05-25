@@ -449,8 +449,8 @@ width: 250px;
 
   <audio id="flipSound" src="click.mp3"></audio>
 
- <script>
- const items = [
+<script>
+const items = [
   // =========================
   // 4 STARS
   // =========================
@@ -530,20 +530,27 @@ width: 250px;
   { name: 'Minjung', rarity: 'secret', image: 'minjung.png' },
 
   { name: 'Lucien', rarity: 'secret', image: 'lucien.PNG' },
-     
+
   { name: 'Alina', rarity: 'secret', image: 'alina3.png' }
 ];
 
-let coinCount = 1000000;
+let coinCount = 100000000000;
 
-// ✅ ONLY ONE collection object
+// UNIQUE COLLECTION NAMES
+const uniqueNames = [...new Set(items.map(item => item.name))];
+
+// COLLECTION STORAGE
 const collection = {};
-items.forEach(item => collection[item.name] = 0);
+
+uniqueNames.forEach(name => {
+  collection[name] = 0;
+});
 
 function updateCoinDisplay() {
   document.getElementById('coinDisplay').textContent = 'Coins: ' + coinCount;
 
   const buttons = document.querySelectorAll('.earnMoreBtn');
+
   buttons.forEach(btn => {
     const cost = parseInt(btn.textContent);
     btn.disabled = coinCount < cost;
@@ -557,36 +564,43 @@ function updateCollectionDisplay() {
 
   let content = `
     <div class="collection-title">Collection</div>
+
     <ul class="collection-list">
   `;
 
-  items.forEach(item => {
-    const count = collection[item.name];
+  // ONLY LOOP UNIQUE NAMES
+  uniqueNames.forEach(name => {
+    const count = collection[name];
     const owned = count > 0;
 
-    if (owned) collectedCount++;
+    if (owned) {
+      collectedCount++;
+    }
 
     content += `
       <li class="${owned ? '' : 'uncollected'}">
-        ✦ ${item.name}
+        ✦ ${name}
         ${count > 1 ? ' x' + count : ''}
       </li>
     `;
   });
 
-  content += '</ul>';
+  content += `</ul>`;
 
-  const progressPercent = (collectedCount / items.length) * 100;
+  const progressPercent =
+    (collectedCount / uniqueNames.length) * 100;
 
   content += `
     <div class="progress-wrapper">
       <div class="progress-text">
-        ${collectedCount}/${items.length} Collected
+        ${collectedCount}/${uniqueNames.length} Collected
       </div>
 
       <div class="progress-bar">
-        <div class="progress-bar-fill"
-        style="width:${progressPercent}%"></div>
+        <div
+          class="progress-bar-fill"
+          style="width:${progressPercent}%">
+        </div>
       </div>
     </div>
   `;
@@ -594,34 +608,58 @@ function updateCollectionDisplay() {
   container.innerHTML = content;
 }
 
-updateCollectionDisplay();
-
 function getRandomItem() {
   const roll = Math.random();
 
-  const fourStars = items.filter(i => i.rarity === '4');
-  const fiveStars = items.filter(i => i.rarity === '5');
-  const secrets = items.filter(i => i.rarity === 'secret');
+  const fourStars =
+    items.filter(i => i.rarity === '4');
 
-  if (roll < 0.75) return fourStars[Math.floor(Math.random() * fourStars.length)];
-  if (roll < 0.95) return fiveStars[Math.floor(Math.random() * fiveStars.length)];
-  return secrets[Math.floor(Math.random() * secrets.length)];
+  const fiveStars =
+    items.filter(i => i.rarity === '5');
+
+  const secrets =
+    items.filter(i => i.rarity === 'secret');
+
+  if (roll < 0.75) {
+    return fourStars[
+      Math.floor(Math.random() * fourStars.length)
+    ];
+  }
+
+  if (roll < 0.95) {
+    return fiveStars[
+      Math.floor(Math.random() * fiveStars.length)
+    ];
+  }
+
+  return secrets[
+    Math.floor(Math.random() * secrets.length)
+  ];
 }
 
 function doPull(count) {
   if (coinCount < count) {
     document.getElementById('notEnough').style.display = 'block';
-    setTimeout(() => document.getElementById('notEnough').style.display = 'none', 2000);
+
+    setTimeout(() => {
+      document.getElementById('notEnough').style.display = 'none';
+    }, 2000);
+
     return;
   }
 
   coinCount -= count;
+
   updateCoinDisplay();
 
-  const container = document.getElementById('resultContainer');
-  const loader = document.getElementById('loading');
+  const container =
+    document.getElementById('resultContainer');
+
+  const loader =
+    document.getElementById('loading');
 
   container.innerHTML = '';
+
   loader.style.display = 'block';
 
   setTimeout(() => {
@@ -637,6 +675,7 @@ function doPull(count) {
       inner.className = 'card-inner';
 
       const front = document.createElement('div');
+
       front.className =
         'card-front ' +
         (item.rarity === '4'
@@ -649,13 +688,16 @@ function doPull(count) {
       back.className = 'card-back';
 
       const img = document.createElement('img');
+
       img.src = item.image;
       img.alt = item.name;
       img.title = item.name;
 
       back.appendChild(img);
+
       inner.appendChild(front);
       inner.appendChild(back);
+
       card.appendChild(inner);
 
       card.addEventListener('click', () => {
@@ -663,19 +705,23 @@ function doPull(count) {
 
         card.classList.add('flipped');
 
-        const glow =
-          item.rarity === '4'
-            ? 'glow-blue'
-            : item.rarity === '5'
-            ? 'glow-yellow'
-            : 'glow-purple';
+        card.classList.add(
+          `glow-${
+            item.rarity === '4'
+              ? 'blue'
+              : item.rarity === '5'
+              ? 'yellow'
+              : 'purple'
+          }`
+        );
 
-        card.classList.add(glow);
         card.classList.add('animate-glow');
 
         document.getElementById('flipSound').play();
 
+        // COUNTS ALL VERSIONS TOGETHER
         collection[item.name]++;
+
         updateCollectionDisplay();
       });
 
@@ -684,18 +730,21 @@ function doPull(count) {
   }, 1500);
 }
 
-// Snake game message
+// Snake game score
 window.addEventListener('message', event => {
   if (event.data && event.data.type === 'snakeScore') {
     const score = event.data.score;
-    document.getElementById('snakeScore').textContent = 'Snake Score: ' + score;
+
+    document.getElementById('snakeScore').textContent =
+      'Snake Score: ' + score;
 
     coinCount += score;
+
     updateCoinDisplay();
   }
 });
 
-// Init
+// Initial setup
 updateCollectionDisplay();
 updateCoinDisplay();
 </script>
