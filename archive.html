@@ -132,6 +132,24 @@
   border-radius: 16px;
   }
 
+  /* Special Vex card */
+.vex-card .card-back {
+  padding: 0;
+  overflow: hidden;
+}
+
+.vex-card .vex-video,
+.vex-card .vex-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 16px;
+}
+
+.vex-card .vex-image {
+  display: none;
+}
+
   /* Rarity coloring for front backgrounds */
   .rarity-4star .card-front {
     background: linear-gradient(135deg, #8ab6ff, #467fdb);
@@ -385,7 +403,17 @@
       <div class="cards">
 
 
-          <div class="card"><div class="card-inner"><div class="card-front">Vex</div><div class="card-back"><img src="bettercookie.png" alt="Vex"></div></div></div>
+         <div class="card vex-card">
+  <div class="card-inner">
+    <div class="card-front">Vex</div>
+    <div class="card-back">
+      <video class="vex-video" playsinline>
+        <source src="taskvex.mov" type="video/quicktime">
+      </video>
+      <img class="vex-image" src="tastvexpic.JPG" alt="Vex">
+    </div>
+  </div>
+</div>
 
        <div class="card"><div class="card-inner"><div class="card-front">Kairo</div><div class="card-back"><img src="bettercookie.png" alt="Kairo"></div></div></div>
           
@@ -434,11 +462,57 @@
 
     
 <script>
-  // Flip card toggle on click
   document.querySelectorAll('.card').forEach(card => {
-    card.addEventListener('click', () => {
-      card.classList.toggle('flipped');
-    });
+
+    if (card.classList.contains('vex-card')) {
+
+      const video = card.querySelector('.vex-video');
+      const image = card.querySelector('.vex-image');
+
+      card.addEventListener('click', () => {
+
+        const isFlipped = card.classList.contains('flipped');
+
+        if (!isFlipped) {
+          // Flip the card
+          card.classList.add('flipped');
+
+          // Reset the video
+          video.currentTime = 0;
+          video.style.display = 'block';
+          image.style.display = 'none';
+
+          // Play the video
+          video.play();
+        } else {
+          // Flip back
+          card.classList.remove('flipped');
+
+          // Stop and reset the video
+          video.pause();
+          video.currentTime = 0;
+
+          // Reset the image for the next flip
+          video.style.display = 'block';
+          image.style.display = 'none';
+        }
+      });
+
+      // When the video finishes, show the image
+      video.addEventListener('ended', () => {
+        video.style.display = 'none';
+        image.style.display = 'block';
+      });
+
+    } else {
+
+      // Normal cards keep their original behavior
+      card.addEventListener('click', () => {
+        card.classList.toggle('flipped');
+      });
+
+    }
+
   });
 </script>
 
