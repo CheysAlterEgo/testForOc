@@ -453,10 +453,7 @@ inset 0 2px 0 rgba(255, 255, 255, 0.5);
 <script>
  const items = [
     // 4-stars (hidden from sidebar display)
-    { name: 'Envo', rarity: '4', image: 'envo.jpg' },
-    { name: 'Skull', rarity: '4', image: 'skull.jpg' },
-    { name: 'disk', rarity: '4', image: 'disk.jpg' },
-    { name: 'cat', rarity: '4', image: 'cat.jpg' },
+  
 
 
     // 5-stars
@@ -474,7 +471,7 @@ inset 0 2px 0 rgba(255, 255, 255, 0.5);
     { name: 'Yunsu', rarity: 'secret', image: 'taskyunsu.JPG' }
   ];
 
-let coinCount = 60;
+let coinCount = 20;
 
 /* ✅ THIS WAS MISSING — FIXED */
 const visibleItems = items.filter(item => item.rarity !== '4');
@@ -548,12 +545,10 @@ function updateCollectionDisplay() {
 function getRandomItem() {
   const roll = Math.random();
 
-  const fourStars = items.filter(i => i.rarity === '4');
   const fiveStars = items.filter(i => i.rarity === '5');
   const secrets = items.filter(i => i.rarity === 'secret');
 
-  if (roll < 0.75) return fourStars[Math.floor(Math.random() * fourStars.length)];
-  if (roll < 0.95) return fiveStars[Math.floor(Math.random() * fiveStars.length)];
+  if (roll < 0.5) return fiveStars[Math.floor(Math.random() * fiveStars.length)];
   return secrets[Math.floor(Math.random() * secrets.length)];
 }
 
